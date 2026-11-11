@@ -85,45 +85,49 @@ chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-shell"
 
 # Copy system scripts and configs
 cp "${REPO_ROOT}/system/power/monodesk-profile-ctl" "${INCLUDES_DIR}/usr/bin/"
-chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-profile-ctl"
+cp "${REPO_ROOT}/system/hardware/monodesk-hw-detect" "${INCLUDES_DIR}/usr/bin/"
+chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-profile-ctl" "${INCLUDES_DIR}/usr/bin/monodesk-hw-detect"
 cp "${REPO_ROOT}/services/monodesk-shell.service" "${INCLUDES_DIR}/etc/systemd/user/"
 
 # Copy Full First-Party Applications Suite
-cp "${REPO_ROOT}/applications/welcome/monodesk_welcome.py" "${INCLUDES_DIR}/usr/bin/monodesk-welcome"
-cp "${REPO_ROOT}/applications/welcome/monodesk-welcome.desktop" "${INCLUDES_DIR}/usr/share/applications/"
+APPS=(
+    "welcome:monodesk_welcome.py:monodesk-welcome"
+    "control-centre:monodesk_control_centre.py:monodesk-control-centre"
+    "hardware-report:monodesk_hardware_report.py:monodesk-hardware-centre"
+    "system-monitor:monodesk_system_monitor.py:monodesk-system-monitor"
+    "settings:monodesk_settings.py:monodesk-settings"
+    "update-manager:monodesk_update_manager.py:monodesk-updater"
+    "software-manager:monodesk_software_manager.py:monodesk-store"
+    "privacy:monodesk_privacy.py:monodesk-privacy"
+    "backup:monodesk_backup.py:monodesk-backup"
+    "recovery:monodesk_recovery.py:monodesk-recovery"
+    "workspace:monodesk_workspace.py:monodesk-workspace"
+    "ai-assistant:monodesk_ai.py:monodesk-ai"
+    "accounts:monodesk_accounts.py:monodesk-accounts"
+    "disk-manager:monodesk_disk_manager.py:monodesk-disk-manager"
+    "device-manager:monodesk_device_manager.py:monodesk-device-manager"
+    "network-centre:monodesk_network_centre.py:monodesk-network-centre"
+    "bluetooth-centre:monodesk_bluetooth_centre.py:monodesk-bluetooth-centre"
+    "print-centre:monodesk_print_centre.py:monodesk-print-centre"
+    "clipboard:monodesk_clipboard.py:monodesk-clipboard"
+    "accessibility:monodesk_accessibility.py:monodesk-accessibility"
+    "compatibility:monodesk_compatibility.py:monodesk-compatibility"
+    "gaming:monodesk_gaming.py:monodesk-gaming"
+    "developer-centre:monodesk_developer.py:monodesk-developer"
+)
 
-cp "${REPO_ROOT}/applications/control-centre/monodesk_control_centre.py" "${INCLUDES_DIR}/usr/bin/monodesk-control-centre"
-cp "${REPO_ROOT}/applications/control-centre/monodesk-control-centre.desktop" "${INCLUDES_DIR}/usr/share/applications/"
+for item in "${APPS[@]}"; do
+    IFS=":" read -r app_dir script_name bin_name <<< "$item"
+    if [[ -f "${REPO_ROOT}/applications/${app_dir}/${script_name}" ]]; then
+        cp "${REPO_ROOT}/applications/${app_dir}/${script_name}" "${INCLUDES_DIR}/usr/bin/${bin_name}"
+    fi
+    find "${REPO_ROOT}/applications/${app_dir}" -name "*.desktop" -exec cp {} "${INCLUDES_DIR}/usr/share/applications/" \;
+done
 
-cp "${REPO_ROOT}/applications/hardware-report/monodesk_hardware_report.py" "${INCLUDES_DIR}/usr/bin/monodesk-hardware-centre"
-cp "${REPO_ROOT}/applications/hardware-report/monodesk-hardware-report.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/system-monitor/monodesk_system_monitor.py" "${INCLUDES_DIR}/usr/bin/monodesk-system-monitor"
-cp "${REPO_ROOT}/applications/system-monitor/monodesk-system-monitor.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/settings/monodesk_settings.py" "${INCLUDES_DIR}/usr/bin/monodesk-settings"
-cp "${REPO_ROOT}/applications/settings/monodesk-settings.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/update-manager/monodesk_update_manager.py" "${INCLUDES_DIR}/usr/bin/monodesk-updater"
-cp "${REPO_ROOT}/applications/update-manager/monodesk-update-manager.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/software-manager/monodesk_software_manager.py" "${INCLUDES_DIR}/usr/bin/monodesk-store"
-cp "${REPO_ROOT}/applications/software-manager/monodesk-software-manager.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/privacy/monodesk_privacy.py" "${INCLUDES_DIR}/usr/bin/monodesk-privacy"
-cp "${REPO_ROOT}/applications/privacy/monodesk-privacy.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/backup/monodesk_backup.py" "${INCLUDES_DIR}/usr/bin/monodesk-backup"
-cp "${REPO_ROOT}/applications/backup/monodesk-backup.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/recovery/monodesk_recovery.py" "${INCLUDES_DIR}/usr/bin/monodesk-recovery"
-cp "${REPO_ROOT}/applications/recovery/monodesk-recovery.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/workspace/monodesk_workspace.py" "${INCLUDES_DIR}/usr/bin/monodesk-workspace"
-cp "${REPO_ROOT}/applications/workspace/monodesk-workspace.desktop" "${INCLUDES_DIR}/usr/share/applications/"
-
-cp "${REPO_ROOT}/applications/ai-assistant/monodesk_ai.py" "${INCLUDES_DIR}/usr/bin/monodesk-ai"
-cp "${REPO_ROOT}/applications/ai-assistant/monodesk-ai.desktop" "${INCLUDES_DIR}/usr/share/applications/"
+if [[ -f "${REPO_ROOT}/applications/nvidia-installer/monodesk-nvidia-installer.sh" ]]; then
+    cp "${REPO_ROOT}/applications/nvidia-installer/monodesk-nvidia-installer.sh" "${INCLUDES_DIR}/usr/bin/monodesk-nvidia-installer"
+    cp "${REPO_ROOT}/applications/nvidia-installer/monodesk-nvidia-installer.desktop" "${INCLUDES_DIR}/usr/share/applications/" || true
+fi
 
 chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-"*
 

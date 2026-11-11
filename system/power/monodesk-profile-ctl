@@ -85,11 +85,44 @@ def apply_standard_profile():
     print("    • Standard balanced power governor set")
     print("    • Desktop telemetry widget enabled")
 
+def auto_detect_profile():
+    """Invoke monodesk-hw-detect to determine the multi-factor recommended profile."""
+    hw_detect_bin = "/usr/bin/monodesk-hw-detect"
+    if not os.path.exists(hw_detect_bin):
+        # Fallback to local script relative to repo
+        repo_detect = os.path.abspath(os.path.join(os.path.dirname(__file__), "../hardware/monodesk-hw-detect"))
+        if os.path.exists(repo_detect):
+            hw_detect_bin = repo_detect
+
+    rec = "standard"
+    reasons = []
+    try:
+        proc = subprocess.run([sys.executable, hw_detect_bin, "--recommend"], stdout=subprocess.PIPE, text=True, check=False)
+        rec = proc.stdout.strip().lower() or "standard"
+        proc_reasons = subprocess.run([sys.executable, hw_detect_bin, "--reasons"], stdout=subprocess.PIPE, text=True, check=False)
+        reasons = [line.strip() for line in proc_reasons.stdout.splitlines() if line.strip()]
+    except Exception:
+        # Internal fallback if script not executable directly
+        try:
+            sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../hardware")))
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("monodesk_hw_detect", os.path.abspath(os.path.join(os.path.dirname(__file__), "../hardware/monodesk-hw-detect")))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            hw = mod.detect_all()
+            rec, reasons = mod.recommend_profile(hw)
+        except Exception:
+            pass
+
+    return rec, reasons
+
 def main():
     parser = argparse.ArgumentParser(description="MONODESK OS Performance Profile Controller")
     subparsers = parser.add_subparsers(dest="command")
 
     get_parser = subparsers.add_parser("get", help="Print current active profile")
+    rec_parser = subparsers.add_parser("recommend", help="Analyze hardware and print recommended profile")
+    auto_parser = subparsers.add_parser("auto", help="Automatically analyze hardware and apply recommended profile")
     set_parser = subparsers.add_parser("set", help="Switch performance profile")
     set_parser.add_argument("profile", choices=["lite", "standard"], help="Target profile: lite or standard")
 
@@ -98,6 +131,22 @@ def main():
     if args.command == "get" or not args.command:
         cur = get_current_profile()
         print(f"Current profile: MONODESK {cur.capitalize()}")
+    elif args.command == "recommend":
+        rec, reasons = auto_detect_profile()
+        print(f"Recommended Profile: MONODESK {rec.upper()}")
+        print("Hardware Evaluation Rationales:")
+        for r in reasons:
+            print(f"  • {r}")
+    elif args.command == "auto":
+        rec, reasons = auto_detect_profile()
+        print(f"[*] Multi-factor hardware detection completed.")
+        print(f"[*] Recommendation: MONODESK {rec.upper()}")
+        for r in reasons:
+            print(f"    - {r}")
+        if rec == "lite":
+            apply_lite_profile()
+        else:
+            apply_standard_profile()
     elif args.command == "set":
         if args.profile == "lite":
             apply_lite_profile()

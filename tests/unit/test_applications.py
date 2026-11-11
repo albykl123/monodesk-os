@@ -32,6 +32,7 @@ sys.path.insert(0, os.path.join(REPO_ROOT, "applications/gaming"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "applications/developer-centre"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "desktop/widgets"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "system/power"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "system/hardware"))
 
 class TestHardwareRedaction(unittest.TestCase):
     def test_mac_address_redaction(self):
@@ -196,6 +197,93 @@ class TestDeveloperCentre(unittest.TestCase):
         self.assertGreater(len(DEV_STACKS), 0)
         app = MonodeskDeveloperCentre()
         self.assertIsNotNone(app)
+
+class TestHardwareDetectionService(unittest.TestCase):
+    def setUp(self):
+        import types
+        from importlib.machinery import SourceFileLoader
+        loader = SourceFileLoader("monodesk_hw_detect", os.path.join(REPO_ROOT, "system/hardware/monodesk-hw-detect"))
+        self.hw_mod = types.ModuleType("monodesk_hw_detect")
+        loader.exec_module(self.hw_mod)
+
+    def test_detect_all_structure(self):
+        hw = self.hw_mod.detect_all()
+        required_keys = ["cpu", "ram", "gpu", "network", "bluetooth", "audio", "storage", "display_input", "power", "firmware"]
+        for k in required_keys:
+            self.assertIn(k, hw)
+
+    def test_cpu_detection_structure(self):
+        cpu = self.hw_mod.detect_cpu()
+        self.assertIn("arch", cpu)
+        self.assertIn("cores", cpu)
+        self.assertIn("threads", cpu)
+        self.assertIn("flags", cpu)
+        self.assertIsInstance(cpu["threads"], int)
+        self.assertGreaterEqual(cpu["threads"], 1)
+
+    def test_ram_detection_structure(self):
+        ram = self.hw_mod.detect_ram()
+        self.assertIn("total_mb", ram)
+        self.assertIn("available_mb", ram)
+        self.assertIsInstance(ram["total_mb"], int)
+        self.assertGreater(ram["total_mb"], 0)
+
+    def test_sensitive_data_redaction(self):
+        raw = "Interface wlan0 MAC 11:22:33:44:55:66, UUID 12345678-1234-1234-1234-123456789abc, Serial Number: ABC-9999"
+        redacted = self.hw_mod.redact_sensitive(raw)
+        self.assertNotIn("11:22:33:44:55:66", redacted)
+        self.assertNotIn("12345678-1234-1234-1234-123456789abc", redacted)
+        self.assertNotIn("ABC-9999", redacted)
+        self.assertIn("[REDACTED_MAC]", redacted)
+        self.assertIn("[REDACTED_UUID]", redacted)
+
+class TestAdaptiveProfileRecommendation(unittest.TestCase):
+    def setUp(self):
+        import types
+        from importlib.machinery import SourceFileLoader
+        loader = SourceFileLoader("monodesk_hw_detect", os.path.join(REPO_ROOT, "system/hardware/monodesk-hw-detect"))
+        self.hw_mod = types.ModuleType("monodesk_hw_detect")
+        loader.exec_module(self.hw_mod)
+
+    def test_recommend_lite_profile_low_spec_hardware(self):
+        mock_hw = {
+            "ram": {"total_mb": 3800, "available_mb": 2200, "swap_total_mb": 0, "zram_active": False},
+            "cpu": {"model": "Intel Core i3-2348M", "arch": "x86_64", "cores": 2, "threads": 2, "flags": ["sse4_1"], "has_avx": False, "has_avx2": False, "has_sse4_2": False, "is_low_power": True, "freq_mhz": 2300.0},
+            "gpu": {"devices": [{"device": "Intel HD 3000", "driver": "i915"}], "active_driver": "i915", "acceleration": "software_rasterizer", "renderer": "llvmpipe", "vulkan_supported": False},
+            "network": {"adapters": [], "has_wifi": True, "has_ethernet": True},
+            "bluetooth": {"present": False, "controller": "none", "powered": False},
+            "audio": {"cards": ["Intel HDA"], "pipewire_active": True},
+            "storage": {"disks": [{"name": "/dev/sda", "size": "500G", "is_rotational": True, "is_ssd": False, "transport": "sata", "model": "Hitachi HDD"}], "has_nvme": False, "has_ssd": False, "has_hdd": True},
+            "display_input": {"displays": [{"output": "eDP-1", "resolution": "1366x768", "primary": True}], "touchpad_present": True, "multitouch": True},
+            "power": {"has_battery": True, "battery_pct": 80, "state": "Discharging", "ac_online": False},
+            "firmware": {"boot_mode": "bios", "secure_boot": "unsupported"}
+        }
+        profile, reasons = self.hw_mod.recommend_profile(mock_hw)
+        self.assertEqual(profile, "lite")
+        self.assertGreater(len(reasons), 0)
+
+    def test_recommend_standard_profile_modern_hardware(self):
+        mock_hw = {
+            "ram": {"total_mb": 16384, "available_mb": 12000, "swap_total_mb": 2048, "zram_active": True},
+            "cpu": {"model": "AMD Ryzen 7 5700U", "arch": "x86_64", "cores": 8, "threads": 16, "flags": ["avx", "avx2", "sse4_2"], "has_avx": True, "has_avx2": True, "has_sse4_2": True, "is_low_power": False, "freq_mhz": 1800.0},
+            "gpu": {"devices": [{"device": "AMD Radeon Vega 8", "driver": "amdgpu"}], "active_driver": "amdgpu", "acceleration": "hardware", "renderer": "AMD Radeon Graphics", "vulkan_supported": True},
+            "network": {"adapters": [], "has_wifi": True, "has_ethernet": True},
+            "bluetooth": {"present": True, "controller": "hci0", "powered": True},
+            "audio": {"cards": ["HD-Audio Generic"], "pipewire_active": True},
+            "storage": {"disks": [{"name": "/dev/nvme0n1", "size": "512G", "is_rotational": False, "is_ssd": True, "transport": "nvme", "model": "Samsung SSD"}], "has_nvme": True, "has_ssd": True, "has_hdd": False},
+            "display_input": {"displays": [{"output": "eDP-1", "resolution": "1920x1080", "primary": True}], "touchpad_present": True, "multitouch": True},
+            "power": {"has_battery": True, "battery_pct": 98, "state": "Full", "ac_online": True},
+            "firmware": {"boot_mode": "uefi", "secure_boot": "enabled"}
+        }
+        profile, reasons = self.hw_mod.recommend_profile(mock_hw)
+        self.assertEqual(profile, "standard")
+        self.assertGreater(len(reasons), 0)
+
+    def test_generate_report_formatting(self):
+        hw = self.hw_mod.detect_all()
+        report = self.hw_mod.generate_report(hw)
+        self.assertIn("MONODESK OS 1.0 — HARDWARE DETECTION & ADAPTIVE PROFILE REPORT", report)
+        self.assertIn("ADAPTIVE PROFILE RECOMMENDATION:", report)
 
 if __name__ == "__main__":
     unittest.main()

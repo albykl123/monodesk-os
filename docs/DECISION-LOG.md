@@ -53,3 +53,12 @@
 - **Context:** Artificial intelligence assistants often introduce heavy background resource drain, mandatory cloud tracking, and privacy concerns.
 - **Decision:** Make the **MONODESK Local AI Assistant** completely optional, disabled by default, and 100% on-device (interfacing with local llama.cpp / Ollama endpoints). Zero cloud API keys, zero network telemetry.
 - **Consequences:** MONODESK OS functions flawlessly without internet access or AI dependencies. Users with capable hardware can optionally enable local inference.
+
+---
+
+### Decision 7: Single Universal PC ISO with Multi-Factor Adaptive Profiling vs. Separate Hardware Editions
+- **Date:** 2026-11-11
+- **Status:** **APPROVED & IMPLEMENTED (FINAL ARCHITECTURE AMENDMENT)**
+- **Context:** Hardware diversity across PCs ranges from legacy dual-core machines with mechanical HDDs to modern 16-thread laptops with NVMe storage. Creating separate laptop-specific ISOs (e.g. one for Lenovo IdeaPad Slim 5 and another for Lenovo B590) fragments maintenance and restricts distribution.
+- **Decision:** Ship **ONE UNIVERSAL AMD64/x86-64 INSTALLATION ISO** (`monodesk-os-1.0.0-universal-amd64.iso`). Implement a dedicated hardware detection service (`system/hardware/monodesk-hw-detect`) that evaluates CPU, RAM, GPU 3D acceleration, storage medium, and power state to dynamically configure adaptive profiles (**MONODESK Standard** vs. **MONODESK Lite**) from a single unified codebase.
+- **Consequences:** Eliminates ISO fragmentation. Both Lenovo test devices serve as initial validation platforms while the single ISO boots, adapts, and installs across all compatible x86-64 PCs worldwide. Strict non-destructive disk protections prevent automated partition modification.

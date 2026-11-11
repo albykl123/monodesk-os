@@ -1,21 +1,39 @@
 # MONODESK OS 1.0 — Final Product Architecture Specification
-## The Monochrome Computing Experience
+## The Monochrome Computing Experience (Universal PC Edition)
 
-**Document Version:** 1.0.0  
-**Classification:** Official Product Architecture Baseline  
+**Document Version:** 1.1.0 (Amended: Universal PC Baseline)  
+**Classification:** Official Product Architecture Specification  
 **Release:** 1.0.0 (Universal PC Edition)  
 **Target Architecture:** AMD64 / x86-64  
-**Base Distribution:** Debian 12 (Bookworm) Stable
+**Base Distribution:** Debian 12 (Bookworm) Pinned Stable  
+**Single Distributable Target:** `monodesk-os-1.0.0-universal-amd64.iso`
 
 ---
 
-### 1. Architectural Philosophy
+### 1. Executive Product Decision: Single Universal ISO
 
-MONODESK OS is engineered as an integrated, desktop-first personal computer operating system. It achieves a unique, cohesive monochrome computing experience inspired by high-contrast industrial minimalism and dot-matrix visual language, without duplicating or infringing upon proprietary Nothing OS intellectual property.
+MONODESK OS 1.0 ships as **ONE UNIVERSAL AMD64/x86-64 INSTALLATION ISO**.
 
-The system is structured into four distinct, decoupled engineering layers:
+> [!IMPORTANT]
+> **Non-Negotiable Architecture Amendment:**
+> Separate laptop-specific distribution ISOs (such as one for Lenovo IdeaPad Slim 5 and another for Lenovo B590) are strictly forbidden. The Lenovo IdeaPad Slim 5 and Lenovo B590 serve as initial physical hardware validation targets only. They do not define or restrict the supported hardware range of MONODESK OS.
+>
+> The exact same ISO image provides:
+> 1. Universal Live Boot Environment (runs in memory without altering disks).
+> 2. Universal Calamares Graphical PC Installer with LUKS encryption.
+> 3. Custom MONODESK Desktop Shell (Qt 6 / QML).
+> 4. Hardware Detection & Adaptive Profile Service (`monodesk-hw-detect`).
+> 5. Driver, Firmware, and Safe Fallback Mechanisms.
+> 6. Emergency Recovery & Diagnostic Environment (`monodesk-recovery`).
+> 7. Hardware-Adaptive Profiles (MONODESK Standard vs MONODESK Lite).
+> 8. Curated Software Store and Cryptographically Signed Updater.
+> 9. First-Boot Welcome and Setup Onboarding Wizard.
 
-```
+---
+
+### 2. Four-Layer System Architecture
+
+```text
 +-------------------------------------------------------------------------------+
 |                       LAYER 1: MONODESK EXPERIENCE                            |
 |  MONODESK Shell (Qt 6 / QML) • Dock • Launcher • Quick Search (Alt+Space)     |
@@ -24,12 +42,14 @@ The system is structured into four distinct, decoupled engineering layers:
 |                       LAYER 2: MONODESK APPLICATIONS                          |
 |  Welcome Onboarding • Central Settings • Software Store • Safe Updater        |
 |  Hardware Centre • System Monitor • Privacy Dashboard • Backup Manager        |
-|  Recovery Centre • Smart Workspace • Performance Profiles • Optional Local AI |
+|  Recovery Centre • Smart Workspace • Compatibility Centre • Gaming Centre     |
+|  Developer Centre • Device Manager • Disk Manager • Optional Local AI         |
 +-------------------------------------------------------------------------------+
 |                       LAYER 3: MONODESK SYSTEM PLATFORM                       |
+|  Hardware Detection & Adaptive Profiler (monodesk-hw-detect)                  |
+|  Profile Controller (monodesk-profile-ctl auto / lite / standard)             |
 |  D-Bus Session Services (org.monodesk.Shell) • PolicyKit Helpers              |
-|  monodesk-profile-ctl (Lite vs Standard) • Hardware Event Integration        |
-|  System Diagnostics & Redaction Engine • Power Management Daemons             |
+|  Diagnostic Redaction Engine • Power Management Daemons (TLP / PPD)           |
 +-------------------------------------------------------------------------------+
 |                       LAYER 4: LINUX FOUNDATION                               |
 |  Debian 12 Bookworm Pinned Stable • Linux 6.1 LTS Kernel with Universal Microcode |
@@ -40,9 +60,8 @@ The system is structured into four distinct, decoupled engineering layers:
 
 ---
 
-### 2. Component Ownership & Boundary Model
+### 3. Component Ownership & Boundary Model
 
-A critical engineering principle of MONODESK OS is **strict component ownership**:
 1. **Desktop Surface, Dock, Launcher, Quick Search, Control Centre, and Widgets:**
    - Exclusively owned by `MONODESK Shell` (built with Qt 6 / QML).
    - Redundant default panels and notification applets from the base desktop are disabled during session configuration to prevent duplicate UI elements.
@@ -55,37 +74,49 @@ A critical engineering principle of MONODESK OS is **strict component ownership*
 
 ---
 
-### 3. Subsystem Architecture
+### 4. Subsystem Specifications
 
-#### 3.1 Display & Shell Subsystem
-- **Engine:** Qt 6 / QML with Python backend bridge (`desktop/shell/monodesk_shell.py`).
-- **Rendering:** Qt Quick scenegraph with OpenGL hardware acceleration via Mesa.
-- **Design Tokens:** Defined centrally in `themes/design-tokens.json` and consumed through `themes/MonodeskTheme.qml`.
-- **Adaptive Modes:** Dark mode (`#0A0A0C` void black surface), Light mode (`#F6F6F8` soft white surface), and automated scheduled solar switching.
+#### 4.1 Hardware Detection & Diagnostic Service (`monodesk-hw-detect`)
+The system includes a dedicated hardware diagnostic service that interrogates the host across ten distinct domains:
+1. **CPU:** Architecture (`x86_64`), vendor, physical cores, logical threads, instruction capabilities (`avx`, `avx2`, `sse4_2`), frequencies, and low-power categorization.
+2. **RAM:** Total memory, usable memory, swap allocation, and active zRAM compression.
+3. **GPU & Graphics:** PCI controller enumeration, active kernel driver (`i915`, `amdgpu`, `nouveau`, `nvidia`), 3D hardware acceleration vs. software rasterizer fallback (`llvmpipe`, `softpipe`), and Vulkan ICD presence.
+4. **Network:** Wired Ethernet adapters, Wi-Fi chipsets, kernel drivers, link states.
+5. **Bluetooth:** Controller discovery, BlueZ status, `rfkill` states.
+6. **Audio:** PipeWire 0.3+ sound server, WirePlumber session manager, sound cards.
+7. **Storage:** NVMe vs SATA controllers, SSD vs rotational HDD status, capacity, and GPT vs MBR partition structures.
+8. **Display & Input:** Display resolutions, refresh rates, primary monitors, touchpads with multitouch/libinput gesture support.
+9. **Power & Battery:** Battery health and capacity percentage, AC power connection state, power-profiles-daemon status.
+10. **Firmware:** Boot mode (UEFI vs Legacy BIOS) and Secure Boot state (`mokutil` / efivars).
 
-#### 3.2 Audio & Multimedia Subsystem
-- **Core Server:** PipeWire 0.3+ with WirePlumber session manager.
-- **Routing:** Replaces legacy PulseAudio and ALSA while maintaining backwards-compatible emulation libraries (`pipewire-pulse`, `pipewire-alsa`).
-- **Control:** The Control Centre and taskbar interact with PipeWire via standard D-Bus and `pactl` interfaces.
+All diagnostic logs are stored at `/var/log/monodesk-hardware.log` and `/var/log/monodesk-hardware.json` with sensitive identifiers (MAC addresses, UUIDs, serial numbers) automatically redacted.
 
-#### 3.3 Hardware & Power Profiles Subsystem
-- **Dynamic Profiles:**
-  - **MONODESK Lite:** Configured for 4 GB RAM systems (e.g. Lenovo B590). Disables window compositing shadows, engages aggressive zRAM compression (zstd, 50% RAM), and sets power-saver governor.
-  - **MONODESK Standard:** Configured for 8 GB+ RAM systems (e.g. Lenovo IdeaPad Slim 5). Enables full compositing, window snapping, desktop widgets, and balanced power governor.
-- **Driver Model:**
-  - Intel: Kernel `i915` / `xe` + Mesa Iris/Crocus.
-  - AMD: Kernel `amdgpu` + Mesa RADV/RadeonSI.
-  - NVIDIA: Nouveau open-source driver out-of-the-box; proprietary DKMS driver installed via `monodesk-nvidia-installer`.
+#### 4.2 Multi-Factor Adaptive Profile Engine
+Rather than relying on RAM alone, MONODESK OS evaluates the system holistically to recommend and apply performance profiles:
 
-#### 3.4 Software Management & Updater Subsystem
-- **Engine:** Debian APT and PackageKit (`applications/store/` and `applications/updater/`).
-- **Safeguards:** Cryptographic GPG signature verification is enforced. Essential packages (`systemd`, `linux-image`, `grub`, `libc6`, `xfwm4`) cannot be removed by user actions.
-- **Update Verification:** Categorizes security patches vs regular updates, provides download progress, and detects kernel reboot requirements.
+| Hardware Factor | MONODESK Lite Trigger | MONODESK Standard Trigger |
+| :--- | :--- | :--- |
+| **Available RAM** | `< 5.5 GB` (target 4 GB systems) | `>= 7.5 GB` (target 8 GB+ systems) |
+| **CPU Capability** | `<= 2 threads` or no SSE4.2 / AVX | `>= 4 threads` with AVX / SSE4.2 |
+| **GPU Acceleration** | Software rasterizer (`llvmpipe` / `swrast`) | Native DRM/KMS hardware acceleration (`amdgpu`, `i915`, `nouveau`, `nvidia`) |
+| **Storage Medium** | Rotational mechanical HDD | Solid-state storage (NVMe / SATA SSD) |
+| **Power State** | Low battery (`< 25%`) on DC power | AC mains power connected |
 
-#### 3.5 Privacy & Security Subsystem
-- **Telemetry:** 100% Zero Telemetry. No analytics, tracking beacons, or background remote pings.
-- **Firewall:** UFW active by default with `INPUT DROP` policy.
-- **Diagnostic Redaction:** `monodesk-hardware-centre` automatically scrubs MAC addresses, serial numbers, and storage UUIDs before displaying or exporting reports.
+- **MONODESK Standard:** Full Qt Quick scenegraph compositor, subtle window shadows, fluid window snapping, rich desktop telemetry widgets, optional local AI, balanced power governor.
+- **MONODESK Lite:** Window compositing shadows and heavy animations disabled, aggressive zRAM memory compression (zstd 50%), reduced background services, conservative power governor, target idle RAM ~700–900 MB.
+
+Users can run `monodesk-profile-ctl auto` to automatically detect and apply the optimal profile, or manually switch via `monodesk-profile-ctl set lite` / `set standard`.
+
+#### 4.3 Safe Driver & Firmware Fallback
+- **Universal Graphics:** Intel HD/Iris and AMD Radeon GPUs operate out-of-the-box with kernel DRM/KMS and Mesa drivers. NVIDIA systems boot out-of-the-box via open-source Nouveau drivers; proprietary drivers are installed on demand via `monodesk-nvidia-installer`.
+- **Software Rendering Fallback:** If hardware acceleration is unavailable, Mesa automatically falls back to `llvmpipe` modesetting; `monodesk-profile-ctl` automatically engages the Lite profile to maintain responsiveness.
+- **Universal Microcode:** `intel-microcode` and `amd64-microcode` packages are integrated directly into the initramfs.
+
+#### 4.4 Non-Destructive Installation Safety
+- **Universal PC Installer:** Calamares 3.2+ configured with `prompt-install: true`.
+- **Target Disk Transparency:** The installer displays the exact disk model, bus transport (NVMe/SATA/USB), capacity, and existing partition layouts.
+- **Mandatory Confirmation Gate:** The user must explicitly review and confirm the destructive summary before any changes are committed to disk.
+- **No Autonomous Overwrites:** Virtual machine tests run exclusively against disposable virtual disk images (`vm-disposable-test.qcow2`). Physical disks are never partitioned or modified automatically.
 
 ---
 *Authored by Antigravity Operating System Engineering Team.*

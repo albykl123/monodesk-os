@@ -113,24 +113,61 @@ class MonodeskWelcome(WindowBase):
 
     def build_performance_page(self):
         page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
-        title = Gtk.Label(label="Select Performance Profile")
+        title = Gtk.Label(label="Adaptive Performance Profile")
         title.get_style_context().add_class("h1")
         title.set_alignment(0.0, 0.5)
         page.pack_start(title, False, False, 0)
 
+        # Query hardware recommendation
+        rec_profile = "standard"
+        reasons_text = "Standard x86-64 hardware profile"
+        try:
+            hw_detect_bin = "/usr/bin/monodesk-hw-detect"
+            if not os.path.exists(hw_detect_bin):
+                repo_detect = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../system/hardware/monodesk-hw-detect"))
+                if os.path.exists(repo_detect):
+                    hw_detect_bin = repo_detect
+            res = subprocess.run([sys.executable, hw_detect_bin, "--recommend"], stdout=subprocess.PIPE, text=True, check=False)
+            rec_profile = res.stdout.strip().lower() or "standard"
+            res_r = subprocess.run([sys.executable, hw_detect_bin, "--reasons"], stdout=subprocess.PIPE, text=True, check=False)
+            lines = [l.strip() for l in res_r.stdout.splitlines() if l.strip()]
+            if lines:
+                reasons_text = "\n".join([f"• {l.lstrip('- ')}" for l in lines[:3]])
+        except Exception:
+            pass
+
+        rec_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        rec_box.get_style_context().add_class("card")
+        lbl_rec_title = Gtk.Label(label=f"AUTOMATIC RECOMMENDATION: MONODESK {rec_profile.upper()}")
+        lbl_rec_title.set_alignment(0.0, 0.5)
+        lbl_rec_title.get_style_context().add_class("h2")
+        rec_box.pack_start(lbl_rec_title, False, False, 0)
+
+        lbl_rec_reasons = Gtk.Label(label=reasons_text)
+        lbl_rec_reasons.set_line_wrap(True)
+        lbl_rec_reasons.set_alignment(0.0, 0.5)
+        rec_box.pack_start(lbl_rec_reasons, False, False, 0)
+        page.pack_start(rec_box, False, False, 0)
+
         info = Gtk.Label(
-            label="Choose the optimization profile best suited for your computer's specifications:"
+            label="You may accept the recommendation or manually choose an alternate profile below:"
         )
         info.set_alignment(0.0, 0.5)
         page.pack_start(info, False, False, 0)
 
         # Profile selection
         self.radio_lite = Gtk.RadioButton.new_with_label_from_widget(
-            None, "MONODESK Lite — Optimized for 4 GB RAM, older dual-core CPUs, and HDD/SATA storage"
+            None, "MONODESK Lite — Target 4GB RAM, dual-core CPU, reduced background services, no local AI"
         )
         self.radio_std = Gtk.RadioButton.new_with_label_from_widget(
-            self.radio_lite, "MONODESK Standard — Optimized for 8 GB+ RAM, modern quad/octa-core CPUs, NVMe"
+            self.radio_lite, "MONODESK Standard — Modern desktop, full compositor animations, rich widgets, local AI option"
         )
+
+        if rec_profile == "lite":
+            self.radio_lite.set_active(True)
+        else:
+            self.radio_std.set_active(True)
+
         page.pack_start(self.radio_lite, False, False, 4)
         page.pack_start(self.radio_std, False, False, 4)
 
@@ -138,7 +175,7 @@ class MonodeskWelcome(WindowBase):
         btn_apply.connect("clicked", self.apply_profile)
         page.pack_start(btn_apply, False, False, 10)
 
-        self.status_lbl = Gtk.Label(label="")
+        self.status_lbl = Gtk.Label(label=f"Current active profile: MONODESK {rec_profile.capitalize()}")
         page.pack_start(self.status_lbl, False, False, 0)
 
         self.stack.add_titled(page, "performance", "3. Performance")
