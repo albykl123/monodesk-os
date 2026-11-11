@@ -7,10 +7,16 @@ Curated and search-driven graphical package manager for trusted Debian repositor
 import sys
 import os
 import subprocess
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 FEATURED_SOFTWARE = [
     ("Firefox ESR", "firefox-esr", "Web Browser", "Official privacy-focused web browser from Mozilla."),
@@ -27,8 +33,10 @@ FEATURED_SOFTWARE = [
     ("OBS Studio", "obs-studio", "Multimedia", "Live streaming and screen recording software.")
 ]
 
-class MonodeskSoftwareManager(Gtk.Window):
+class MonodeskSoftwareManager(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Software Manager")
         self.set_default_size(880, 580)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -156,7 +164,8 @@ class MonodeskSoftwareManager(Gtk.Window):
             self.lbl_desc.set_text(f"Error launching package action: {e}")
 
 if __name__ == "__main__":
-    app = MonodeskSoftwareManager()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskSoftwareManager()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

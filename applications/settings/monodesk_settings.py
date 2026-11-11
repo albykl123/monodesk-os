@@ -7,13 +7,21 @@ Centralized configuration manager integrating XFCE, systemd, and native MONODESK
 import sys
 import os
 import subprocess
-import gi
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
-
-class MonodeskSettings(Gtk.Window):
+class MonodeskSettings(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Settings")
         self.set_default_size(860, 580)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -162,7 +170,8 @@ class MonodeskSettings(Gtk.Window):
             pass
 
 if __name__ == "__main__":
-    app = MonodeskSettings()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskSettings()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

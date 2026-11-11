@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Clipboard
+Comment=Browse clipboard history, recall recent text snippets, and manage privacy exclusions
+Exec=monodesk-clipboard
+Icon=edit-paste
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupNotify=true

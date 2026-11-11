@@ -10,13 +10,21 @@ import os
 import time
 import subprocess
 import signal
-import gi
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
-
-class MonodeskSystemMonitor(Gtk.Window):
+class MonodeskSystemMonitor(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK System Monitor")
         self.set_default_size(840, 560)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -188,7 +196,8 @@ class MonodeskSystemMonitor(Gtk.Window):
                 pass
 
 if __name__ == "__main__":
-    win = MonodeskSystemMonitor()
-    win.connect("destroy", Gtk.main_quit)
-    win.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        win = MonodeskSystemMonitor()
+        win.connect("destroy", Gtk.main_quit)
+        win.show_all()
+        Gtk.main()

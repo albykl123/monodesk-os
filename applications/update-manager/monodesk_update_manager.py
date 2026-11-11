@@ -8,18 +8,26 @@ reboot notifications, and essential package protection.
 import sys
 import os
 import subprocess
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 CRITICAL_PACKAGES = {
     "systemd", "linux-image-amd64", "grub-efi-amd64", "grub-pc", "xfce4-session",
     "xorg", "lightdm", "libc6", "libpam-systemd", "monodesk-desktop-shell"
 }
 
-class MonodeskUpdateManager(Gtk.Window):
+class MonodeskUpdateManager(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Update Manager")
         self.set_default_size(700, 480)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -140,7 +148,8 @@ class MonodeskUpdateManager(Gtk.Window):
                 self.status_lbl.set_text(f"Failed to launch updater: {e}")
 
 if __name__ == "__main__":
-    app = MonodeskUpdateManager()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskUpdateManager()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Disk Manager
+Comment=Inspect storage drives, manage partitions, mount points, and SMART disk health
+Exec=monodesk-disk-manager
+Icon=drive-harddisk
+Terminal=false
+Type=Application
+Categories=System;HardwareSettings;
+StartupNotify=true

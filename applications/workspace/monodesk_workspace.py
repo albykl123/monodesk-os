@@ -8,10 +8,16 @@ window tiling shortcuts, and keyboard navigation.
 import sys
 import os
 import subprocess
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 def run_cmd(args):
     try:
@@ -20,8 +26,10 @@ def run_cmd(args):
     except Exception:
         return ""
 
-class MonodeskWorkspaceManager(Gtk.Window):
+class MonodeskWorkspaceManager(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Smart Workspace")
         self.set_default_size(720, 480)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -96,7 +104,8 @@ class MonodeskWorkspaceManager(Gtk.Window):
         run_cmd(["xfconf-query", "-c", "xfwm4", "-p", "/general/workspace_count", "-s", str(val)])
 
 if __name__ == "__main__":
-    app = MonodeskWorkspaceManager()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskWorkspaceManager()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

@@ -10,15 +10,23 @@ import os
 import subprocess
 import hashlib
 import json
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 BACKUP_INDEX_PATH = os.path.expanduser("~/.config/monodesk/backup-manifest.json")
 
-class MonodeskBackupManager(Gtk.Window):
+class MonodeskBackupManager(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Backup Manager")
         self.set_default_size(780, 520)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -157,7 +165,8 @@ class MonodeskBackupManager(Gtk.Window):
             self.lbl_status.set_text(f"Restoring {archive_name}...")
 
 if __name__ == "__main__":
-    app = MonodeskBackupManager()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskBackupManager()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

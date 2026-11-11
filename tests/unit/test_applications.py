@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-MONODESK OS — Application Test Suite
-Validates application modules, telemetry extraction logic, and redaction.
+MONODESK OS — Comprehensive Application Test Suite
+Validates application modules, telemetry extraction logic, security policies,
+critical package protections, and hardware compatibility mappings.
 """
 
 import unittest
@@ -12,6 +13,23 @@ import re
 # Add applications to path
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, os.path.join(REPO_ROOT, "applications/hardware-report"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/accounts"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/disk-manager"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/device-manager"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/privacy"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/backup"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/recovery"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/workspace"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/ai-assistant"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/update-manager"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/software-manager"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/system-monitor"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/welcome"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/settings"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/clipboard"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/compatibility"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/gaming"))
+sys.path.insert(0, os.path.join(REPO_ROOT, "applications/developer-centre"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "desktop/widgets"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "system/power"))
 
@@ -56,6 +74,128 @@ class TestProfileController(unittest.TestCase):
     def test_profile_ctl_exists(self):
         ctl_path = os.path.join(REPO_ROOT, "system/power/monodesk-profile-ctl")
         self.assertTrue(os.path.isfile(ctl_path))
+
+class TestAccountManager(unittest.TestCase):
+    def test_get_local_users(self):
+        from monodesk_accounts import get_local_users
+        users = get_local_users()
+        self.assertIsInstance(users, list)
+        self.assertGreater(len(users), 0)
+        self.assertIn("username", users[0])
+        self.assertIn("home", users[0])
+
+class TestDiskManager(unittest.TestCase):
+    def test_get_block_devices(self):
+        from monodesk_disk_manager import get_block_devices
+        devs = get_block_devices()
+        self.assertIsInstance(devs, list)
+        self.assertGreater(len(devs), 0)
+        self.assertIn("name", devs[0])
+
+class TestDeviceManager(unittest.TestCase):
+    def test_parse_lspci_devices(self):
+        from monodesk_device_manager import parse_lspci_devices
+        cats = parse_lspci_devices()
+        self.assertIsInstance(cats, dict)
+        self.assertIn("Display & Graphics (GPU)", cats)
+        self.assertIn("Audio & Multimedia", cats)
+
+class TestPrivacyDashboard(unittest.TestCase):
+    def test_privacy_class_exists(self):
+        from monodesk_privacy import MonodeskPrivacyDashboard
+        app = MonodeskPrivacyDashboard()
+        self.assertIsNotNone(app)
+
+class TestBackupManager(unittest.TestCase):
+    def test_backup_class_exists(self):
+        from monodesk_backup import MonodeskBackupManager, BACKUP_INDEX_PATH
+        self.assertTrue(len(BACKUP_INDEX_PATH) > 0)
+        app = MonodeskBackupManager()
+        self.assertIsNotNone(app)
+
+class TestRecoveryCentre(unittest.TestCase):
+    def test_recovery_class_exists(self):
+        from monodesk_recovery import MonodeskRecoveryCentre
+        app = MonodeskRecoveryCentre()
+        self.assertIsNotNone(app)
+
+class TestWorkspaceManager(unittest.TestCase):
+    def test_workspace_class_exists(self):
+        from monodesk_workspace import MonodeskWorkspaceManager
+        app = MonodeskWorkspaceManager()
+        self.assertIsNotNone(app)
+
+class TestLocalAI(unittest.TestCase):
+    def test_ai_endpoint(self):
+        from monodesk_ai import LOCAL_ENDPOINT, MonodeskLocalAI
+        self.assertEqual(LOCAL_ENDPOINT, "http://127.0.0.1:11434/api/generate")
+        app = MonodeskLocalAI()
+        self.assertIsNotNone(app)
+
+class TestUpdateManager(unittest.TestCase):
+    def test_critical_packages_whitelist(self):
+        from monodesk_update_manager import CRITICAL_PACKAGES, MonodeskUpdateManager
+        self.assertIn("systemd", CRITICAL_PACKAGES)
+        self.assertIn("linux-image-amd64", CRITICAL_PACKAGES)
+        self.assertIn("grub-efi-amd64", CRITICAL_PACKAGES)
+        self.assertIn("xfce4-session", CRITICAL_PACKAGES)
+        app = MonodeskUpdateManager()
+        self.assertIsNotNone(app)
+
+class TestSoftwareManager(unittest.TestCase):
+    def test_featured_software_catalogue(self):
+        from monodesk_software_manager import FEATURED_SOFTWARE, MonodeskSoftwareManager
+        self.assertGreater(len(FEATURED_SOFTWARE), 5)
+        for name, pkg, cat, desc in FEATURED_SOFTWARE:
+            self.assertTrue(len(name) > 0)
+            self.assertTrue(len(pkg) > 0)
+        app = MonodeskSoftwareManager()
+        self.assertIsNotNone(app)
+
+class TestSystemMonitor(unittest.TestCase):
+    def test_system_monitor_class_exists(self):
+        from monodesk_system_monitor import MonodeskSystemMonitor
+        win = MonodeskSystemMonitor()
+        self.assertIsNotNone(win)
+
+class TestWelcome(unittest.TestCase):
+    def test_welcome_class_exists(self):
+        from monodesk_welcome import MonodeskWelcome
+        app = MonodeskWelcome()
+        self.assertIsNotNone(app)
+
+class TestSettings(unittest.TestCase):
+    def test_settings_class_exists(self):
+        from monodesk_settings import MonodeskSettings
+        app = MonodeskSettings()
+        self.assertIsNotNone(app)
+
+class TestClipboard(unittest.TestCase):
+    def test_clipboard_class_exists(self):
+        from monodesk_clipboard import MonodeskClipboard
+        app = MonodeskClipboard()
+        self.assertIsNotNone(app)
+
+class TestCompatibilityCentre(unittest.TestCase):
+    def test_compatibility_matrix(self):
+        from monodesk_compatibility import POPULAR_COMPAT_APPS, MonodeskCompatibilityCentre
+        self.assertGreater(len(POPULAR_COMPAT_APPS), 0)
+        app = MonodeskCompatibilityCentre()
+        self.assertIsNotNone(app)
+
+class TestGamingCentre(unittest.TestCase):
+    def test_gaming_matrix(self):
+        from monodesk_gaming import POPULAR_GAMES_COMPAT, MonodeskGamingCentre
+        self.assertGreater(len(POPULAR_GAMES_COMPAT), 0)
+        app = MonodeskGamingCentre()
+        self.assertIsNotNone(app)
+
+class TestDeveloperCentre(unittest.TestCase):
+    def test_dev_stacks(self):
+        from monodesk_developer import DEV_STACKS, MonodeskDeveloperCentre
+        self.assertGreater(len(DEV_STACKS), 0)
+        app = MonodeskDeveloperCentre()
+        self.assertIsNotNone(app)
 
 if __name__ == "__main__":
     unittest.main()

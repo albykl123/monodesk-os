@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Accounts
+Comment=Manage local users, passwords, administrator privileges, and sessions
+Exec=monodesk-accounts
+Icon=system-users
+Terminal=false
+Type=Application
+Categories=Settings;System;
+StartupNotify=true

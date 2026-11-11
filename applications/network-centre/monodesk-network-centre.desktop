@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Network Centre
+Comment=Configure Wi-Fi networks, wired Ethernet, VPN connections, and DNS diagnostics
+Exec=monodesk-network-centre
+Icon=network-wireless
+Terminal=false
+Type=Application
+Categories=Settings;Network;
+StartupNotify=true

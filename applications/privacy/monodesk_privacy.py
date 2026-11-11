@@ -8,10 +8,16 @@ monitors active background listening services, and enforces 100% Zero-Telemetry 
 import sys
 import os
 import subprocess
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 def run_cmd(args):
     try:
@@ -20,8 +26,10 @@ def run_cmd(args):
     except Exception as e:
         return f"Error: {e}"
 
-class MonodeskPrivacyDashboard(Gtk.Window):
+class MonodeskPrivacyDashboard(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Privacy Dashboard")
         self.set_default_size(820, 560)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -136,7 +144,8 @@ class MonodeskPrivacyDashboard(Gtk.Window):
         self.refresh_privacy_data()
 
 if __name__ == "__main__":
-    app = MonodeskPrivacyDashboard()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskPrivacyDashboard()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

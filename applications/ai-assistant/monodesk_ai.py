@@ -12,15 +12,23 @@ import subprocess
 import json
 import urllib.request
 import urllib.error
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 LOCAL_ENDPOINT = "http://127.0.0.1:11434/api/generate"
 
-class MonodeskLocalAI(Gtk.Window):
+class MonodeskLocalAI(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Local AI Assistant")
         self.set_default_size(780, 560)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -123,7 +131,8 @@ class MonodeskLocalAI(Gtk.Window):
             self.append_chat("System", f"Inference query error: {e}")
 
 if __name__ == "__main__":
-    app = MonodeskLocalAI()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskLocalAI()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()

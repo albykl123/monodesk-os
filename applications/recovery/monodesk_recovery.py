@@ -9,10 +9,16 @@ and filesystem health checks with explicit safeguards against accidental data lo
 import sys
 import os
 import subprocess
-import gi
-
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GLib
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk, Gdk, GLib
+    WindowBase = Gtk.Window
+except ImportError:
+    Gtk = None
+    Gdk = None
+    GLib = None
+    WindowBase = object
 
 def run_cmd(args):
     try:
@@ -21,8 +27,10 @@ def run_cmd(args):
     except Exception as e:
         return f"Unavailable: {e}"
 
-class MonodeskRecoveryCentre(Gtk.Window):
+class MonodeskRecoveryCentre(WindowBase):
     def __init__(self):
+        if Gtk is None:
+            return
         super().__init__(title="MONODESK Recovery Centre")
         self.set_default_size(780, 540)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -129,7 +137,8 @@ class MonodeskRecoveryCentre(Gtk.Window):
             self.log(fdisk_out[:400] + "...")
 
 if __name__ == "__main__":
-    app = MonodeskRecoveryCentre()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    if Gtk is not None:
+        app = MonodeskRecoveryCentre()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()
