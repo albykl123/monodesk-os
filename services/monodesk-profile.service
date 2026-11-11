@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/monodesk-profile-ctl get
+ExecStart=/usr/bin/monodesk-profile-ctl auto
 RemainAfterExit=yes
 
 [Install]

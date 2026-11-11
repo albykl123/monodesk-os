@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Large OS disk images & ISO artifacts (GitHub 100MB limit)
+*.iso
+*.img
+*.qcow2
+*.tar
+*.raw
+
+# Live-Build working directories & temporary chroots
+build/live-build/.build/
+build/live-build/chroot/
+build/live-build/binary/
+build/live-build/cache/
+build/live-build/stage/
+build/live-build/source/
+build/live-build/.lock
+build/logs/*.log
+
+# Local builder keys
+builder_key
+builder_key.pub

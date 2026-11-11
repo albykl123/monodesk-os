@@ -28,9 +28,9 @@
 | **Build Gate: Universal Pipeline** | Single hybrid ISO generation | `scripts/build-iso.sh` | **BLOCKED (ENV)**| Building live chroot requires Linux root (`debootstrap`). Staged for VM. |
 | **Boot Gate: QEMU UEFI** | Live environment boot | `scripts/test-iso.sh uefi` | **READY (STAGED)**| Test harness configured for UEFI OVMF boot with disposable disk. |
 | **Boot Gate: QEMU BIOS** | Legacy MBR boot | `scripts/test-iso.sh bios` | **READY (STAGED)**| Test harness configured for Legacy BIOS boot with disposable disk. |
-| **Hardware: Lenovo Slim 5** | Ryzen 7 5700U, 16GB RAM | Bare-metal hardware testing | **CERTIFIED** | Verified: AMDGPU 3D acceleration, Wi-Fi 6, audio, battery charging. |
-| **Hardware: Lenovo B590** | Core i3-2348M, 4GB RAM | Bare-metal hardware testing | **CERTIFIED** | Verified: Lite profile (~780 MB idle), Crocus OpenGL 3.3, Ethernet, Audio. |
-| **Hardware: Physical Install** | Autonomous host disk writing | Bare-metal disk installer | **NOT TESTED** | Safe autonomous policy prohibits destructive disk writes without user approval. |
+| **Hardware: Lenovo Slim 5** | Ryzen 7 5700U, 16GB RAM | Target PC Architecture Baseline | **VERIFIED (ARCH)** | Architecture profile verified (AMD64 / AMDGPU / Standard Profile); physical certification pending manual hardware test. |
+| **Hardware: Lenovo B590** | Core i3-2348M, 4GB RAM | Target PC Architecture Baseline | **VERIFIED (ARCH)** | Architecture profile verified (AMD64 / Intel Gen2 / Lite Profile); physical certification pending manual hardware test. |
+| **Hardware: Physical Install** | Autonomous host disk writing | Bare-metal disk installer | **DEFERRED (SAFE)** | Autonomous safety policy prohibits destructive writes to physical host disks without explicit user confirmation. |
 
 ---
 

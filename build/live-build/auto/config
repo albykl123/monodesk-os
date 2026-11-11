@@ -9,9 +9,11 @@ set -e
 lb config noauto \
     --mode debian \
     --distribution bookworm \
+    --parent-distribution bookworm \
     --architectures amd64 \
     --linux-flavours amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
+    --parent-archive-areas "main contrib non-free non-free-firmware" \
     --bootloader grub-efi \
     --binary-images iso-hybrid \
     --iso-application "MONODESK OS 1.0 Universal PC" \
@@ -24,7 +26,7 @@ lb config noauto \
     --updates true \
     --backports false \
     --apt-recommends false \
-    --apt-indices none \
+    --apt-indices false \
     --cache true \
     --compression xz \
     "${@}"

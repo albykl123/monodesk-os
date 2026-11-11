@@ -21,9 +21,14 @@ Download `monodesk-os-1.0.0-universal-amd64.iso` and verify the checksum:
 sha256sum -c monodesk-os-1.0.0-universal-amd64.iso.sha256
 ```
 
+#### On Windows / Multi-Boot (Using Ventoy):
+1. Format your USB flash drive once using Ventoy (exFAT / GPT mode recommended).
+2. Simply copy `monodesk-os-1.0.0-universal-amd64.iso` directly onto the Ventoy USB drive partition.
+3. Reboot your PC, select the USB in the BIOS/UEFI boot menu, and select MONODESK OS from the Ventoy menu.
+
 #### On Windows (Using Rufus):
 1. Launch Rufus and select your USB flash drive.
-2. Select the ISO file.
+2. Select the `monodesk-os-1.0.0-universal-amd64.iso` file.
 3. Choose **GPT** partition scheme for modern UEFI PCs (or **MBR** for legacy BIOS).
 4. When prompted by Rufus, select **Write in DD Image mode**.
 5. Click **Start** to write the image.

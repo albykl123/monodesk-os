@@ -12,9 +12,13 @@ firmware-misc-nonfree
 firmware-iwlwifi
 firmware-realtek
 firmware-atheros
+firmware-ath9k-htc
 firmware-libertas
 firmware-brcm80211
 firmware-zd1211
+
+# Audio & DSP Firmware
+firmware-sof-signed
 
 # Dedicated GPU Firmware
 firmware-amd-graphics

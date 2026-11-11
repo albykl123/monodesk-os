@@ -51,8 +51,15 @@ done
 echo "[2/6] Validating source code and configuration..."
 bash "${REPO_ROOT}/scripts/check-source.sh"
 
-# 3. Staging MONODESK Assets into live-build chroot overlay
-echo "[3/6] Staging MONODESK Qt 6 / QML desktop shell, apps, and branding..."
+# 3. Live-Build Configuration
+echo "[3/6] Initializing live-build configuration and chroot..."
+cd "${BUILD_DIR}"
+lb clean
+lb config
+chmod +x "${BUILD_DIR}/config/hooks/live/"*.hook.chroot 2>/dev/null || true
+
+# 4. Staging MONODESK Assets into live-build chroot overlay
+echo "[4/6] Staging MONODESK Qt 6 / QML desktop shell, apps, and branding..."
 INCLUDES_DIR="${BUILD_DIR}/config/includes.chroot"
 mkdir -p \
     "${INCLUDES_DIR}/usr/bin" \
@@ -87,17 +94,19 @@ chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-shell"
 cp "${REPO_ROOT}/system/power/monodesk-profile-ctl" "${INCLUDES_DIR}/usr/bin/"
 cp "${REPO_ROOT}/system/hardware/monodesk-hw-detect" "${INCLUDES_DIR}/usr/bin/"
 chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-profile-ctl" "${INCLUDES_DIR}/usr/bin/monodesk-hw-detect"
+mkdir -p "${INCLUDES_DIR}/etc/systemd/user" "${INCLUDES_DIR}/etc/systemd/system"
 cp "${REPO_ROOT}/services/monodesk-shell.service" "${INCLUDES_DIR}/etc/systemd/user/"
+cp "${REPO_ROOT}/services/monodesk-profile.service" "${INCLUDES_DIR}/etc/systemd/system/"
 
 # Copy Full First-Party Applications Suite
 APPS=(
     "welcome:monodesk_welcome.py:monodesk-welcome"
     "control-centre:monodesk_control_centre.py:monodesk-control-centre"
-    "hardware-report:monodesk_hardware_report.py:monodesk-hardware-centre"
+    "hardware-report:monodesk_hardware_report.py:monodesk-hardware-report"
     "system-monitor:monodesk_system_monitor.py:monodesk-system-monitor"
     "settings:monodesk_settings.py:monodesk-settings"
-    "update-manager:monodesk_update_manager.py:monodesk-updater"
-    "software-manager:monodesk_software_manager.py:monodesk-store"
+    "update-manager:monodesk_update_manager.py:monodesk-update-manager"
+    "software-manager:monodesk_software_manager.py:monodesk-software-manager"
     "privacy:monodesk_privacy.py:monodesk-privacy"
     "backup:monodesk_backup.py:monodesk-backup"
     "recovery:monodesk_recovery.py:monodesk-recovery"
@@ -124,6 +133,11 @@ for item in "${APPS[@]}"; do
     find "${REPO_ROOT}/applications/${app_dir}" -name "*.desktop" -exec cp {} "${INCLUDES_DIR}/usr/share/applications/" \;
 done
 
+# Create aliases / compatibility symlinks
+ln -sf monodesk-hardware-report "${INCLUDES_DIR}/usr/bin/monodesk-hardware-centre"
+ln -sf monodesk-update-manager "${INCLUDES_DIR}/usr/bin/monodesk-updater"
+ln -sf monodesk-software-manager "${INCLUDES_DIR}/usr/bin/monodesk-store"
+
 if [[ -f "${REPO_ROOT}/applications/nvidia-installer/monodesk-nvidia-installer.sh" ]]; then
     cp "${REPO_ROOT}/applications/nvidia-installer/monodesk-nvidia-installer.sh" "${INCLUDES_DIR}/usr/bin/monodesk-nvidia-installer"
     cp "${REPO_ROOT}/applications/nvidia-installer/monodesk-nvidia-installer.desktop" "${INCLUDES_DIR}/usr/share/applications/" || true
@@ -131,11 +145,9 @@ fi
 
 chmod +x "${INCLUDES_DIR}/usr/bin/monodesk-"*
 
-# 4. Live-Build Execution
-echo "[4/6] Initializing live-build configuration and chroot..."
+# 5. Live-Build Execution
+echo "[5/6] Building bootable live-build hybrid ISO..."
 cd "${BUILD_DIR}"
-lb clean --purge
-lb config
 lb build
 
 # 5. Locate Output ISO and Move to Releases

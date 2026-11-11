@@ -43,6 +43,14 @@ lshw
 inxi
 dmidecode
 brightnessctl
+mesa-utils
+vulkan-tools
+x11-xserver-utils
+mokutil
+
+# Printing Subsystem
+cups
+cups-client
 
 # Package Management Tools
 packagekit

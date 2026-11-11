@@ -3,6 +3,11 @@
 # ==============================================================================
 
 componentName: monodesk
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,520px
+windowPlacement: center
 
 strings:
     productName:         "MONODESK OS"
@@ -19,12 +24,11 @@ strings:
 images:
     productLogo:         "/usr/share/icons/hicolor/scalable/apps/monodesk-icon.svg"
     productIcon:         "/usr/share/icons/hicolor/scalable/apps/monodesk-icon.svg"
-    productWelcome:      "welcome.png"
 
 style:
-   Sidebar: "widget"
-   Navigation: "widget"
+   sidebarBackground:    "#0b0c10"
+   sidebarText:          "#e0e0e0"
+   sidebarTextSelect:    "#ffffff"
 
 slideshow:               "show.qml"
-
 slideshowAPI: 2

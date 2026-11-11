@@ -49,7 +49,6 @@ upower
 power-profiles-daemon
 acpid
 acpi-support
-tlp
 libinput-bin
 xserver-xorg-input-libinput
 

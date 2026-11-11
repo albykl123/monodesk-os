@@ -12,7 +12,13 @@ OUTPUT_DIR="$(dirname "$ISO_PATH")"
 echo "=== [MONODESK OS] Generating Release Manifests ==="
 
 MANIFEST_FILE="${OUTPUT_DIR}/BUILD-MANIFEST.txt"
+MANIFEST_JSON="${OUTPUT_DIR}/BUILD-MANIFEST.json"
 PKG_MANIFEST_FILE="${OUTPUT_DIR}/PACKAGE-MANIFEST.txt"
+
+ISO_BYTES=$(stat -c%s "$ISO_PATH" 2>/dev/null || echo "0")
+ISO_SHA=$(sha256sum "$ISO_PATH" 2>/dev/null | awk '{print $1}' || echo "N/A")
+ISO_FILENAME=$(basename "$ISO_PATH")
+BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 cat << EOF > "$MANIFEST_FILE"
 ================================================================================
@@ -21,11 +27,11 @@ cat << EOF > "$MANIFEST_FILE"
 Release Version:       1.0.0-RELEASE (Universal PC Edition)
 Base Distribution:     Debian GNU/Linux 12 (Bookworm)
 Target Architecture:   x86-64 / AMD64 (Generic PC Baseline)
-Build Timestamp:       $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+Build Timestamp:       ${BUILD_TIME}
 Builder:               Antigravity Autonomous Operating System Engineer
-Target ISO Image:      $(basename "$ISO_PATH")
-SHA-256 Checksum:      $(sha256sum "$ISO_PATH" 2>/dev/null | awk '{print $1}' || echo "Pending verification")
-Measured Size:         $(stat -c%s "$ISO_PATH" 2>/dev/null || echo "N/A") bytes
+Target ISO Image:      ${ISO_FILENAME}
+SHA-256 Checksum:      ${ISO_SHA}
+Measured Size:         ${ISO_BYTES} bytes
 
 Hardware Baseline:
   - CPU:               Intel Core, Celeron, Pentium (x86-64); AMD Ryzen, Athlon (64-bit)
@@ -36,6 +42,35 @@ Hardware Baseline:
   - Desktop Shell:     XFCE 4.18 + MONODESK Shell applets
   - Installer:         Calamares 3.2+ with LUKS full-disk encryption support
 ================================================================================
+EOF
+
+cat << EOF > "$MANIFEST_JSON"
+{
+  "project": "MONODESK OS",
+  "version": "1.0.0",
+  "edition": "Universal PC Edition",
+  "architecture": "x86_64",
+  "base_os": "Debian GNU/Linux 12 (Bookworm)",
+  "release_tag": "v1.0.0",
+  "build_timestamp": "${BUILD_TIME}",
+  "iso_filename": "${ISO_FILENAME}",
+  "iso_bytes": ${ISO_BYTES},
+  "sha256": "${ISO_SHA}",
+  "profiles": [
+    {
+      "name": "Standard",
+      "target_ram": "8GB+",
+      "compositor": true,
+      "animations": true
+    },
+    {
+      "name": "Lite",
+      "target_ram": "4GB",
+      "compositor": false,
+      "zram": true
+    }
+  ]
+}
 EOF
 
 cat << 'EOF' > "$PKG_MANIFEST_FILE"
