@@ -1,0 +1,41 @@
+{
+  "project": "MONODESK OS",
+  "version": "1.0.0",
+  "edition": "Universal PC Edition",
+  "architecture": "x86_64",
+  "base_os": "Debian GNU/Linux 12 (Bookworm)",
+  "kernel": "6.1.0-54-amd64",
+  "release_tag": "v1.0.0",
+  "build_timestamp": "2026-11-11T15:46:36Z",
+  "build_host": "Disk F Direct Hybrid ISO Pipeline (PyCdlib 1.16.0)",
+  "iso_filename": "monodesk-os-1.0.0-universal-amd64.iso",
+  "iso_paths": [
+    "F:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.0-universal-amd64.iso",
+    "F:\\anti\\monodesk-os\\src\\monodesk-os-1.0.0-universal-amd64.iso",
+    "F:\\anti\\src\\monodesk-os-1.0.0-universal-amd64.iso"
+  ],
+  "iso_bytes": 3268114432,
+  "sha256": "78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c",
+  "boot_verification": {
+    "uefi_ovmf_qemu": "PASSED",
+    "grub_menu": "PASSED",
+    "live_overlayfs_mount": "PASSED",
+    "systemd_graphical_target": "PASSED",
+    "hw_detect_in_live_vm": "PASSED",
+    "disposable_disk_attached": "vm-disposable-test.qcow2 (25G)"
+  },
+  "profiles": [
+    {
+      "name": "Standard",
+      "target_ram": "8GB+",
+      "compositor": true,
+      "animations": true
+    },
+    {
+      "name": "Lite",
+      "target_ram": "4GB",
+      "compositor": false,
+      "zram": true
+    }
+  ]
+}

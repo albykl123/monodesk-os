@@ -13,26 +13,26 @@
 
 | Acceptance Criteria | Target Component | Method | Gate Status |
 | :--- | :--- | :--- | :--- |
-| **Universal ISO Generation** | `releases/monodesk-os-1.0.0-universal-amd64.iso` | Debian live-build (AMD64) | **IN PROGRESS (ACTIVE BUILD)** |
-| **ISO Integrity & Plausibility** | ISO file size & structure | `scripts/verify-iso.sh` | **STAGED (AWAITING BUILD)** |
-| **SHA-256 Checksum** | `SHA256SUMS.txt` / `.sha256` | Independent `sha256sum` verification | **STAGED (AWAITING BUILD)** |
-| **UEFI Boot Verification** | Hybrid OVMF firmware | QEMU x86_64 UEFI live boot | **READY (DISPOSABLE VM)** |
-| **Legacy BIOS Boot Verification**| Hybrid MBR boot sector | QEMU x86_64 BIOS live boot | **READY (DISPOSABLE VM)** |
-| **Live Desktop Environment** | LightDM autologin + XFCE 4.18 | Graphical live desktop startup | **CONFIGURED & VERIFIED** |
-| **MONODESK Desktop Shell** | Qt 6 / QML Shell & Taskbar | `monodesk-shell` autostart | **SYNTAX & IMPORTS VERIFIED** |
-| **Hardware Detection Service** | CPU, RAM, GPU, Net, Audio, Power | `monodesk-hw-detect` | **PASSED (10 DOMAINS)** |
+| **Universal ISO Generation** | `releases/monodesk-os-1.0.0-universal-amd64.iso` | `scripts/build-iso-win.py` (PyCdlib AMD64) | **GENERATED (3,268,114,432 BYTES)** |
+| **ISO Integrity & Plausibility** | ISO volume headers & Disk F mirrors | `PyCdlib` + `Get-Item` across 3 Disk F paths | **VERIFIED** |
+| **SHA-256 Checksum** | `SHA256SUMS.txt` / `.sha256` | `78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c` | **VERIFIED (`Get-FileHash`)** |
+| **UEFI Boot Verification** | Hybrid OVMF firmware (`q35` + EDK2) | QEMU x86_64 UEFI live boot (`task-2377`) | **PASSED (LIVE SYSTEMD + OVERLAYFS)** |
+| **Legacy BIOS Boot Verification**| El Torito `cdboot.img` MBR entry | ISO El Torito BIOS boot record | **REGISTERED (QEMU BIOS UNTESTED)** |
+| **Live Desktop Environment** | Headless base rootfs + overlay | Layered `/etc/calamares`, themes, `graphical.target` | **STAGED (`0.img` BASE CLI ONLY)** |
+| **MONODESK Desktop Shell** | Qt 6 / QML Shell & Taskbar | `monodesk-shell` staged in overlay | **SYNTAX & STAGING VERIFIED** |
+| **Hardware Detection Service** | CPU, RAM, GPU, Net, Audio, Power | `/usr/bin/monodesk-hw-detect --report` in live QEMU | **PASSED (LIVE + UNIT TESTS)** |
 | **Standard Profile Integration**| 8GB+ RAM, full compositing | `monodesk-profile-ctl` | **PASSED (UNIT TESTS)** |
-| **Lite Profile Integration** | 4GB RAM, low-overhead zram | `monodesk-profile-ctl` | **PASSED (UNIT TESTS)** |
-| **Core Application Suite** | 20+ first-party applications | Headless instantiation & entry tests | **PASSED (30 TESTS)** |
-| **Calamares Installer** | LUKS, partition, unpackfs | Calamares 3.2.61 debian-live | **STAGED & BRANDED** |
-| **Disposable Disk Installation** | `vm-disposable-test.qcow2` (25GB) | Non-destructive VM test install | **READY (DISK CREATED)** |
-| **Installed System Boot** | GRUB EFI / vmlinuz / initrd | VM reboot from installed disk | **READY (DISPOSABLE VM)** |
-| **Recovery Environment** | `monodesk-recovery` utility | Chroot repair & safe mode boot | **DOCUMENTED & PACKAGED** |
-| **Package Manifest (SBOM)** | `PACKAGE-MANIFEST.txt` | Complete package inventory | **GENERATED** |
-| **Build Manifest** | `BUILD-MANIFEST.json` | Release build metadata | **GENERATED** |
+| **Lite Profile Integration** | 4GB RAM, low-overhead zram | `monodesk-profile-ctl` + live `1959 MB` QEMU test | **PASSED (LIVE + UNIT TESTS)** |
+| **Core Application Suite** | 23 first-party apps + 30 `/usr/bin/monodesk-*` bins | Pytest suite + live `/usr/bin` inspection | **PASSED (32 TESTS)** |
+| **Calamares Installer** | LUKS, partition, unpackfs configs | `/etc/calamares` staged in live overlay | **STAGED (INTERACTIVE GUI UNTESTED)** |
+| **Disposable Disk Installation** | `vm-disposable-test.qcow2` (25GB) | Exposed as `/dev/vda` during QEMU UEFI live test | **LIVE DETECTED (INSTALL NOT EXECUTED)** |
+| **Installed System Boot** | GRUB EFI / vmlinuz / initrd | Reboot from installed disposable disk | **DEFERRED (CLI BASE ROOTFS)** |
+| **Recovery Environment** | `monodesk-recovery` + GRUB safe stanza | Safe Graphics stanza & CLI recovery binary staged | **STAGED & VERIFIED IN GRUB** |
+| **Package Manifest (SBOM)** | `PACKAGE-MANIFEST.txt` | 309 entries (28 MONODESK + 281 Debian Bookworm) | **GENERATED** |
+| **Build Manifest** | `BUILD-MANIFEST.json` / `BUILD-MANIFEST.txt` | Release build metadata & Disk F paths | **GENERATED** |
 | **Release Notes** | `RELEASE-NOTES.md` | Feature breakdown & guides | **COMPLETE** |
 | **Known Limitations** | `KNOWN-LIMITATIONS.md` | Architectural boundaries | **COMPLETE** |
-| **Release Directory Integrity** | `releases/` distribution directory | Release packaging audit | **STAGED** |
+| **Release Directory Integrity** | `releases/` & `src/` Disk F artifacts | ISO + SHA256SUMS + manifests verified | **COMPLETE (DEPLOYED TO DISK F)** |
 
 ---
 

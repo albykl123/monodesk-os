@@ -1,0 +1,36 @@
+MONODESK OS 1.0 — UNIVERSAL PC EDITION RELEASE MANIFEST
+==========================================================
+Product:             MONODESK OS 1.0 (Universal PC Edition)
+Version:             1.0.0-RELEASE
+Architecture:        amd64 (x86_64)
+Base Distribution:   Debian GNU/Linux 12 (Bookworm)
+Kernel:              Linux 6.1.0-54-amd64
+Build Timestamp:     2026-11-11T15:46:36Z
+Build Environment:   Direct Disk F: Hybrid ISO Pipeline (PyCdlib 1.16.0 + 7-Zip)
+ISO Filename:        monodesk-os-1.0.0-universal-amd64.iso
+ISO Size (Bytes):    3268114432
+ISO Size (MB):       3116.72 MB
+ISO SHA-256:         78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c
+
+Disk F: Reflected Output Paths
+------------------------------
+- F:\anti\monodesk-os\releases\monodesk-os-1.0.0-universal-amd64.iso
+- F:\anti\monodesk-os\src\monodesk-os-1.0.0-universal-amd64.iso
+- F:\anti\src\monodesk-os-1.0.0-universal-amd64.iso
+
+Boot & Initramfs Components
+---------------------------
+- Boot Firmware:     Hybrid El Torito BIOS (cdboot.img) + UEFI (boot/grub/efi.img, FAT16 130,023,424 bytes)
+- Volume Identity:   MONODESK_1_0_X64
+- Kernel Image:      live/vmlinuz (8,234,944 bytes)
+- Initramfs:         live/initrd.img (30,797,578 bytes; 593,920-byte early CPIO + zstd Debian initrd)
+- Root Filesystem:   live/filesystem.ext4 (3,085,959,168 bytes; 281 Debian Bookworm packages)
+- MONODESK Overlay:  monodesk/rootfs_overlay (81 staged MONODESK OS apps, QML shell, themes, services, Calamares config)
+
+Hardware Compatibility & Validation Targets
+-------------------------------------------
+- Supported CPUs:    64-bit x86_64 (Intel & AMD with microcode support)
+- System Profiles:   Hardware-adaptive MONODESK STANDARD (8GB+ RAM) & MONODESK LITE (2-4GB RAM)
+- Initial Targets:   Lenovo IdeaPad Slim 5 (Intel Iris Xe / AX201) & Lenovo B590 (Intel HD 4000 / AR9485)
+- QA Verification:   QEMU x86_64 q35 UEFI (edk2-x86_64-code.fd) live boot + overlayfs + systemd + monodesk-hw-detect PASSED
+- Unit Test Suite:   pytest -v (32 passed in 2.79s)

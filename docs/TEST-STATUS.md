@@ -24,26 +24,26 @@
 | **Integration: Package Safety** | Essential package locks | `monodesk-updater` blacklist | **PASS** | Critical packages (`systemd`, `linux-image`, `grub`, `xfwm4`) protected. |
 | **Security: Firewall Defaults** | Inbound network drop | UFW rules configuration | **PASS** | Inbound DROP, outbound ACCEPT, stateful conntrack active. |
 | **Security: Zero Telemetry** | No external data calls | Codebase grep & policy audit | **PASS** | Zero telemetry endpoints, zero tracking beacons, local memory only. |
-| **Build Gate: Dependencies** | Debian build tools | `scripts/install-build-deps.sh` | **PASS** | `live-build`, `debootstrap`, `xorriso`, `mksquashfs` configured. |
-| **Build Gate: Universal Pipeline** | Single hybrid ISO generation | `scripts/build-iso.sh` | **BLOCKED (ENV)**| Building live chroot requires Linux root (`debootstrap`). Staged for VM. |
-| **Boot Gate: QEMU UEFI** | Live environment boot | `scripts/test-iso.sh uefi` | **READY (STAGED)**| Test harness configured for UEFI OVMF boot with disposable disk. |
-| **Boot Gate: QEMU BIOS** | Legacy MBR boot | `scripts/test-iso.sh bios` | **READY (STAGED)**| Test harness configured for Legacy BIOS boot with disposable disk. |
+| **Build Gate: Dependencies** | Debian & Windows hybrid ISO tools | `scripts/install-build-deps.sh`, `PyCdlib 1.16.0`, `7-Zip` | **PASS** | Windows direct Disk F builder (`scripts/build-iso-win.py`) operational; Linux `live-build` scripts preserved. |
+| **Build Gate: Universal Pipeline** | Single hybrid ISO generation | `scripts/build-iso-win.py` -> Disk F | **PASS** | Generated `3,268,114,432` byte ISO on Disk F (`78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c`). |
+| **Boot Gate: QEMU UEFI** | Live environment boot (`q35` + EDK2) | QEMU `edk2-x86_64-code.fd` + `vm-disposable-test.qcow2` | **PASS** | Verified GRUB 2.06, Linux `6.1.0-54-amd64`, `/scripts/live` `loop0`+`overlayfs`, `systemd`, `monodesk-hw-detect`, 30 `/usr/bin/monodesk-*` bins, clean `poweroff`. |
+| **Boot Gate: QEMU BIOS** | Legacy MBR El Torito entry (`cdboot.img`) | Registered in ISO El Torito BIOS section | **REGISTERED** | BIOS El Torito boot record present; interactive QEMU Legacy BIOS run not separately executed. |
+| **Scope Note: Live Rootfs** | Base Debian Bookworm Ext4 (`0.img`) | Inspected inside live QEMU session | **VERIFIED (CLI BASE)** | Base image contains 281 Debian Bookworm CLI/systemd packages + 81 MONODESK overlay files; full Xorg/XFCE GUI stack not bundled in offline `0.img`. |
 | **Hardware: Lenovo Slim 5** | Ryzen 7 5700U, 16GB RAM | Target PC Architecture Baseline | **VERIFIED (ARCH)** | Architecture profile verified (AMD64 / AMDGPU / Standard Profile); physical certification pending manual hardware test. |
 | **Hardware: Lenovo B590** | Core i3-2348M, 4GB RAM | Target PC Architecture Baseline | **VERIFIED (ARCH)** | Architecture profile verified (AMD64 / Intel Gen2 / Lite Profile); physical certification pending manual hardware test. |
 | **Hardware: Physical Install** | Autonomous host disk writing | Bare-metal disk installer | **DEFERRED (SAFE)** | Autonomous safety policy prohibits destructive writes to physical host disks without explicit user confirmation. |
 
 ---
 
-### 2. Automated Unit Test Summary
+### 2. Automated Unit & Live Boot Test Summary
 
 ```text
-Ran 30 tests in 0.973s
-
-OK (30 passed, 0 failed, 0 errors, 0 warnings)
+pytest -v
+32 passed in 2.79s
 ```
 
-- **All 30 unit tests passed with 100% success rate.**
-- **Hardware Detection & Profiling:** Validated multi-factor evaluation of RAM, CPU cores, GPU hardware acceleration, storage medium, and power state.
+- **All 32 pytest unit tests passed with 100% success rate.**
+- **QEMU UEFI Live Boot (`task-2377`):** Confirmed EDK2 UEFI auto-boot -> GRUB 2.06 -> Kernel `6.1.0-54-amd64` -> `/scripts/live` loopback (`/dev/sr0`, `/dev/loop0`) + layered `overlayfs` (`lowerdir=/run/live/medium/monodesk/rootfs_overlay:/run/live/rootfs`) -> `Welcome to MONODESK OS 1.0 (Universal PC Edition)!` -> `graphical.target` -> `/usr/bin/monodesk-hw-detect --report` recommended `MONODESK LITE` on 1959 MB RAM / 2 threads / `/dev/vda` -> clean `poweroff` (`exit code 0`).
 - **Privacy Redaction:** Validated automated scrubbing of hardware identifiers.
 - **Headless Portability:** All application classes successfully instantiate and execute in headless test environments.
 
@@ -51,11 +51,11 @@ OK (30 passed, 0 failed, 0 errors, 0 warnings)
 
 ### 3. Release Gate Assessment
 
-Current Status: **RELEASE CANDIDATE (FEATURE COMPLETE & TESTED CODEBASE)**
-- **Universal ISO Architecture:** 100% Compliant with Final Architecture Amendment (Single Universal ISO).
-- **Subsystem Implementation:** All 12 subsystems, 20+ first-party applications, and hardware detection services authored, integrated, and verified.
+Current Status: **RELEASED ON DISK F (HYBRID UEFI+BIOS ISO + MANIFESTS + SHA-256 VERIFIED)**
+- **Universal ISO Architecture:** 100% Compliant with Final Architecture Amendment (Single Universal ISO on Disk F).
+- **Subsystem Implementation:** All 12 subsystems, 23 core apps (30 `/usr/bin/monodesk-*` entrypoints), QML shell, themes, Calamares configs, and hardware detection services authored and staged.
 - **Installer Safety:** Calamares configured with mandatory user confirmation and transparent disk layout display.
-- **Next Gating Step:** Execute `sudo bash scripts/build-iso.sh` inside the dedicated Debian 12 AMD64 VM.
+- **Verification Scope:** Direct Disk F ISO generation, SHA-256 checksum, 32/32 unit tests, and QEMU UEFI headless/systemd/`overlayfs` boot verified; Legacy BIOS QEMU test, interactive X11 GUI Calamares flow, and bare-metal physical hardware installs remain unexecuted.
 
 ---
 *Report maintained by the MONODESK Quality Assurance Engineering Team.*
