@@ -1,0 +1,64 @@
+# ==============================================================================
+# MONODESK OS — Core System Packages (Debian 12 AMD64)
+# ==============================================================================
+
+# Kernel & Bootloader
+linux-image-amd64
+grub-pc-bin
+grub-efi-amd64-bin
+efibootmgr
+live-boot
+live-config
+live-config-systemd
+
+# Microcode (Intel & AMD)
+intel-microcode
+amd64-microcode
+
+# Base System Infrastructure
+systemd
+systemd-sysv
+dbus
+dbus-user-session
+sudo
+ca-certificates
+locales
+tzdata
+console-setup
+keyboard-configuration
+
+# Networking & Wireless
+network-manager
+network-manager-gnome
+wpasupplicant
+wireless-tools
+rfkill
+bluetooth
+bluez
+bluez-tools
+
+# Audio Subsystem (PipeWire Stack)
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+pavucontrol
+
+# Power Management & Peripherals
+upower
+power-profiles-daemon
+acpid
+acpi-support
+tlp
+libinput-bin
+xserver-xorg-input-libinput
+
+# Security & Permissions
+ufw
+apparmor
+apparmor-utils
+policykit-1
+pkexec
+
+# Memory & Swap Optimization
+zram-tools

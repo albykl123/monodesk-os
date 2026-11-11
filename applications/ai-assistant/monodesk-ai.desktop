@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=MONODESK Local AI
+Comment=Optional, 100% on-device private assistant powered by local open weights
+Exec=monodesk-ai
+Icon=chat-message-new
+Terminal=false
+Type=Application
+Categories=Utility;Office;
+StartupNotify=true
+NoDisplay=false

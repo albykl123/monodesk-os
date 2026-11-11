@@ -1,0 +1,30 @@
+#!/bin/sh
+# ==============================================================================
+# MONODESK OS — Live-Build Master Auto Configuration
+# Pinned to Debian 12 (Bookworm) AMD64 with hybrid UEFI / BIOS boot
+# ==============================================================================
+
+set -e
+
+lb config noauto \
+    --mode debian \
+    --distribution bookworm \
+    --architectures amd64 \
+    --linux-flavours amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --bootloader grub-efi \
+    --binary-images iso-hybrid \
+    --iso-application "MONODESK OS 1.0 Universal PC" \
+    --iso-preparer "MONODESK Distribution Engineering Team" \
+    --iso-publisher "MONODESK Project" \
+    --iso-volume "MONODESK_1_0_AMD64" \
+    --memtest none \
+    --win32-loader false \
+    --security true \
+    --updates true \
+    --backports false \
+    --apt-recommends false \
+    --apt-indices none \
+    --cache true \
+    --compression xz \
+    "${@}"

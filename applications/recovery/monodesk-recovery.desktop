@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Recovery Centre
+Comment=Safe diagnostic repair tools for packages, bootloaders, and system integrity
+Exec=monodesk-recovery
+Icon=system-reboot
+Terminal=false
+Type=Application
+Categories=System;Settings;Utility;
+StartupNotify=true

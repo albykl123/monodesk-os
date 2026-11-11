@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Control Centre
+Comment=Unified quick settings and hardware controller
+Exec=monodesk-control-centre
+Icon=preferences-system
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;
+StartupNotify=true

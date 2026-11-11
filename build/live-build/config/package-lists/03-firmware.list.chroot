@@ -1,0 +1,20 @@
+# ==============================================================================
+# MONODESK OS — Universal Hardware Firmware Packages
+# ==============================================================================
+
+# General Linux Firmware
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+firmware-misc-nonfree
+
+# Wireless & Bluetooth Firmware
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-libertas
+firmware-brcm80211
+firmware-zd1211
+
+# Dedicated GPU Firmware
+firmware-amd-graphics

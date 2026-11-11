@@ -1,0 +1,49 @@
+# ==============================================================================
+# MONODESK OS — Desktop Environment & Display Stack (XFCE 4.18)
+# ==============================================================================
+
+# X11 & Display Server
+xorg
+xserver-xorg-core
+xserver-xorg-video-all
+xinit
+
+# Graphics Acceleration & Mesa
+mesa-va-drivers
+mesa-vulkan-drivers
+libgl1-mesa-dri
+libglx-mesa0
+
+# Display Manager
+lightdm
+lightdm-gtk-greeter
+
+# XFCE Desktop Suite
+xfce4-session
+xfwm4
+xfce4-panel
+xfdesktop4
+xfce4-settings
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
+xfce4-power-manager
+xfce4-appfinder
+xfce4-notifyd
+thunar
+thunar-volman
+thunar-archive-plugin
+file-roller
+
+# Terminal & Utilities
+xfce4-terminal
+mousepad
+galculator
+ristretto
+
+# Fonts & Typography (Legally redistributable, high-contrast)
+fonts-jetbrains-mono
+fonts-inter
+fonts-ubuntu
+fonts-dejavu-core
+fonts-noto-core
+fonts-noto-mono

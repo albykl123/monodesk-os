@@ -1,0 +1,84 @@
+#!/bin/sh
+# ==============================================================================
+# MONODESK OS — Desktop Theme & Session Ownership Hook
+# MONODESK Shell owns the desktop surface, dock, launcher, widgets, and quick settings.
+# XFWM4 provides reliable window management and compositing.
+# ==============================================================================
+
+set -e
+
+echo "[MONODESK Hook] Configuring MONODESK Shell session ownership..."
+
+# 1. Autostart MONODESK Shell on graphical session login
+AUTOSTART_DIR="/etc/xdg/autostart"
+mkdir -p "$AUTOSTART_DIR"
+
+cat << 'EOF' > "$AUTOSTART_DIR/monodesk-shell.desktop"
+[Desktop Entry]
+Type=Application
+Name=MONODESK Desktop Shell
+Comment=The Monochrome Computing Experience Desktop Shell
+Exec=/usr/bin/monodesk-shell
+OnlyShowIn=XFCE;
+Terminal=false
+StartupNotify=false
+X-XFCE-Autostart-Override=true
+EOF
+
+# 2. Configure XFCE Session to use XFWM4 without duplicate panels
+XFCE_DIR="/etc/xdg/xfce4/xfconf/xfce-perchannel-xml"
+mkdir -p "$XFCE_DIR"
+
+cat << 'EOF' > "$XFCE_DIR/xfce4-session.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-session" version="1.0">
+  <property name="sessions" type="empty">
+    <property name="Failsafe" type="empty">
+      <property name="Client0_Command" type="array">
+        <value type="string" value="xfsettingsd"/>
+      </property>
+      <property name="Client0_PerScreen" type="bool" value="false"/>
+      <property name="Client1_Command" type="array">
+        <value type="string" value="xfwm4"/>
+      </property>
+      <property name="Client1_PerScreen" type="bool" value="false"/>
+    </property>
+  </property>
+</channel>
+EOF
+
+# 3. Configure system-wide GTK themes and fonts
+cat << 'EOF' > "$XFCE_DIR/xsettings.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="Monodesk-Dark"/>
+    <property name="IconThemeName" type="string" value="Tango"/>
+    <property name="CursorThemeName" type="string" value="default"/>
+    <property name="EnableEventSounds" type="bool" value="false"/>
+  </property>
+  <property name="Gtk" type="empty">
+    <property name="FontName" type="string" value="Inter 10"/>
+    <property name="MonospaceFontName" type="string" value="JetBrains Mono 10"/>
+  </property>
+</channel>
+EOF
+
+# 4. Set window manager theme
+cat << 'EOF' > "$XFCE_DIR/xfwm4.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="Monodesk-Dark"/>
+    <property name="use_compositing" type="bool" value="true"/>
+    <property name="show_frame_shadow" type="bool" value="true"/>
+    <property name="box_move" type="bool" value="true"/>
+    <property name="box_resize" type="bool" value="true"/>
+    <property name="title_alignment" type="string" value="center"/>
+    <property name="title_font" type="string" value="Inter Bold 10"/>
+  </property>
+</channel>
+EOF
+
+# Install custom desktop binaries to /usr/bin/
+chmod +x /usr/bin/monodesk-* || true

@@ -1,0 +1,16 @@
+[Unit]
+Description=MONODESK OS Desktop Shell Engine
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/monodesk-shell
+Restart=on-failure
+RestartSec=2s
+Slice=session.slice
+Environment=QT_QPA_PLATFORM=xcb
+Environment=QT_QUICK_CONTROLS_STYLE=Basic
+
+[Install]
+WantedBy=graphical-session.target

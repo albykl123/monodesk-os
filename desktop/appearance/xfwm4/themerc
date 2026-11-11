@@ -1,0 +1,32 @@
+# MONODESK OS — XFWM4 Window Manager Theme
+# Clean monochrome borders and minimal window controls
+
+full_width_title=true
+title_alignment=center
+title_font=Inter Bold 10
+title_shadow_active=false
+title_shadow_inactive=false
+
+active_text_color=#FFFFFF
+inactive_text_color=#707078
+active_border_color=#2A2A30
+inactive_border_color=#1A1A1E
+
+active_color_1=#141416
+active_color_2=#141416
+inactive_color_1=#0E0E10
+inactive_color_2=#0E0E10
+
+button_layout=CHM
+button_spacing=6
+button_offset=8
+maximized_offset=4
+show_app_icon=false
+frame_border_top=28
+frame_border_bottom=2
+frame_border_left=2
+frame_border_right=2
+shadow_delta_x=0
+shadow_delta_y=4
+shadow_opacity=40
+shadow_radius=12

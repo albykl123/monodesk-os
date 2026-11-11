@@ -1,0 +1,11 @@
+[Unit]
+Description=MONODESK OS Performance Profile Boot Initializer
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/monodesk-profile-ctl get
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

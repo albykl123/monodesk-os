@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK System Monitor
+Comment=View real-time system performance and manage running processes
+Exec=monodesk-system-monitor
+Icon=utilities-system-monitor
+Terminal=false
+Type=Application
+Categories=System;Monitor;
+StartupNotify=true

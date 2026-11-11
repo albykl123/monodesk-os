@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Welcome
+Comment=First-boot onboarding and hardware overview for MONODESK OS
+Exec=monodesk-welcome
+Icon=monodesk-icon
+Terminal=false
+Type=Application
+Categories=System;Utility;Settings;
+StartupNotify=true

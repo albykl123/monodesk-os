@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Hardware Report
+Comment=Inspect system hardware diagnostics and export redacted reports
+Exec=monodesk-hardware-report
+Icon=utilities-system-monitor
+Terminal=false
+Type=Application
+Categories=System;HardwareSettings;
+StartupNotify=true

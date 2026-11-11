@@ -1,0 +1,22 @@
+# MONODESK OS — Default UFW Firewall Security Policy
+# Incoming traffic is rejected by default to prevent unauthorized network access.
+# Outgoing traffic is allowed for web browsing, updates, and standard services.
+
+*filter
+:ufw-user-input - [0:0]
+:ufw-user-output - [0:0]
+:ufw-user-forward - [0:0]
+
+# Default policy: incoming DENY, outgoing ALLOW
+-P INPUT DROP
+-P FORWARD DROP
+-P OUTPUT ACCEPT
+
+# Allow loopback traffic
+-A INPUT -i lo -j ACCEPT
+-A OUTPUT -o lo -j ACCEPT
+
+# Allow established and related connections
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+COMMIT

@@ -1,0 +1,79 @@
+#!/bin/sh
+# ==============================================================================
+# MONODESK OS — Live User & Autologin Configuration Hook
+# ==============================================================================
+
+set -e
+
+echo "[MONODESK Hook] Configuring live desktop session and user permissions..."
+
+# Create user monodesk if not exists
+if ! id -u monodesk >/dev/null 2>&1; then
+    useradd -m -s /bin/bash -c "MONODESK Live User" monodesk
+    echo "monodesk:monodesk" | chpasswd
+fi
+
+# Add to necessary groups
+usermod -aG sudo,audio,video,plugdev,netdev,input monodesk
+
+# Grant passwordless sudo for live session
+echo "monodesk ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-monodesk-live
+chmod 0440 /etc/sudoers.d/99-monodesk-live
+
+# Configure LightDM autologin
+mkdir -p /etc/lightdm/lightdm.conf.d
+cat << 'EOF' > /etc/lightdm/lightdm.conf.d/01-monodesk-autologin.conf
+[Seat:*]
+autologin-user=monodesk
+autologin-user-timeout=0
+user-session=xfce
+EOF
+
+# Setup desktop launcher icons for live desktop
+USER_DESKTOP="/home/monodesk/Desktop"
+mkdir -p "$USER_DESKTOP"
+
+# Calamares Installer Desktop Entry
+cat << 'EOF' > "$USER_DESKTOP/calamares.desktop"
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install MONODESK OS
+Comment=Install MONODESK OS permanently to your computer
+Exec=sudo -E calamares
+Icon=system-software-install
+Terminal=false
+StartupNotify=true
+Categories=System;
+EOF
+chmod +x "$USER_DESKTOP/calamares.desktop"
+
+# Welcome Desktop Entry
+cat << 'EOF' > "$USER_DESKTOP/monodesk-welcome.desktop"
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=MONODESK Welcome
+Comment=First-boot onboarding and hardware overview
+Exec=monodesk-welcome
+Icon=monodesk-icon
+Terminal=false
+Categories=System;
+EOF
+chmod +x "$USER_DESKTOP/monodesk-welcome.desktop"
+
+# Hardware Report Desktop Entry
+cat << 'EOF' > "$USER_DESKTOP/monodesk-hardware-report.desktop"
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Hardware Diagnostics
+Comment=Inspect system hardware and drivers
+Exec=monodesk-hardware-report
+Icon=utilities-system-monitor
+Terminal=false
+Categories=System;
+EOF
+chmod +x "$USER_DESKTOP/monodesk-hardware-report.desktop"
+
+chown -R monodesk:monodesk /home/monodesk

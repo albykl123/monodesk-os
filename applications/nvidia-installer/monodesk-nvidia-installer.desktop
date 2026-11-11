@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK NVIDIA Driver Installer
+Comment=Install official NVIDIA proprietary drivers for dedicated GPUs
+Exec=pkexec /usr/bin/monodesk-nvidia-installer
+Icon=video-display
+Terminal=true
+Type=Application
+Categories=System;HardwareSettings;
+StartupNotify=true

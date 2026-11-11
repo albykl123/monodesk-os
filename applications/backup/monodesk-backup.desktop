@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Backup Manager
+Comment=Create and restore verified system snapshots and personal file backups
+Exec=monodesk-backup
+Icon=drive-harddisk
+Terminal=false
+Type=Application
+Categories=System;Archiving;Utility;
+StartupNotify=true

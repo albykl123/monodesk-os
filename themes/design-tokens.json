@@ -1,0 +1,63 @@
+{
+  "name": "MONODESK Design Tokens",
+  "version": "1.0.0",
+  "philosophy": "Minimalist Monochrome with Dot-Matrix Accents",
+  "colors": {
+    "dark": {
+      "surface_base": "#0A0A0C",
+      "surface_panel": "rgba(14, 14, 18, 0.94)",
+      "surface_card": "#16161A",
+      "surface_card_hover": "#222228",
+      "surface_card_active": "#2C2C34",
+      "border": "#26262C",
+      "border_focused": "#FFFFFF",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#A0A0A8",
+      "text_tertiary": "#6C6C76",
+      "accent_red": "#E63946",
+      "accent_red_hover": "#FF4D5E",
+      "indicator_active": "#E63946",
+      "scrollbar": "#32323A"
+    },
+    "light": {
+      "surface_base": "#F6F6F8",
+      "surface_panel": "rgba(255, 255, 255, 0.94)",
+      "surface_card": "#FFFFFF",
+      "surface_card_hover": "#EDEDF2",
+      "surface_card_active": "#E0E0E6",
+      "border": "#D8D8E0",
+      "border_focused": "#000000",
+      "text_primary": "#0E0E10",
+      "text_secondary": "#5C5C66",
+      "text_tertiary": "#8E8E98",
+      "accent_red": "#E63946",
+      "accent_red_hover": "#D62839",
+      "indicator_active": "#E63946",
+      "scrollbar": "#C8C8D0"
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "'JetBrains Mono', 'DSEG7', monospace",
+      "weights": { "bold": 800, "medium": 600 },
+      "letter_spacing": "2px"
+    },
+    "body": {
+      "family": "'Inter', 'Ubuntu', sans-serif",
+      "weights": { "regular": 400, "medium": 500, "semibold": 600 },
+      "letter_spacing": "0px"
+    }
+  },
+  "radii": {
+    "small": 4,
+    "card": 8,
+    "panel": 12,
+    "pill": 999
+  },
+  "animations": {
+    "duration_fast": 120,
+    "duration_normal": 200,
+    "duration_slow": 350,
+    "easing": "Easing.OutCubic"
+  }
+}

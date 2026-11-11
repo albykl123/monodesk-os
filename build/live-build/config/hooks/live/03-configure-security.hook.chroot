@@ -1,0 +1,32 @@
+#!/bin/sh
+# ==============================================================================
+# MONODESK OS — Security Hardening Hook
+# ==============================================================================
+
+set -e
+
+echo "[MONODESK Hook] Hardening network security and enabling system defenses..."
+
+# 1. Enable UFW firewall with default reject policy
+if command -v ufw >/dev/null 2>&1; then
+    ufw default deny incoming || true
+    ufw default allow outgoing || true
+    ufw enable || true
+fi
+
+# 2. Enable AppArmor
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl enable apparmor.service || true
+fi
+
+# 3. Disable root password login via SSH if openssh is present
+if [ -f /etc/ssh/sshd_config ]; then
+    sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+fi
+
+# 4. Disable core dumps for unprivileged users
+cat << 'EOF' > /etc/security/limits.d/99-monodesk-core-dumps.conf
+* hard core 0
+EOF
+
+echo "[MONODESK Hook] Security baseline configured."

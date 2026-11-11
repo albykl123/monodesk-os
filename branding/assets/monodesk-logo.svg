@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <defs>
+    <style>
+      .bg { fill: transparent; }
+      .dot { fill: #FFFFFF; }
+      .text-bold { font-family: 'JetBrains Mono', 'Courier New', monospace; font-weight: 800; font-size: 32px; fill: #FFFFFF; letter-spacing: 4px; }
+      .text-sub { font-family: 'JetBrains Mono', 'Courier New', monospace; font-weight: 400; font-size: 11px; fill: #A0A0A0; letter-spacing: 6px; }
+      .accent-dot { fill: #E63946; }
+    </style>
+  </defs>
+  
+  <!-- Dot Matrix Symbol Mark (6x6 matrix forming an iconic M glyph) -->
+  <g transform="translate(20, 20)">
+    <circle cx="0" cy="0" r="4.5" class="dot"/>
+    <circle cx="0" cy="12" r="4.5" class="dot"/>
+    <circle cx="0" cy="24" r="4.5" class="dot"/>
+    <circle cx="0" cy="36" r="4.5" class="dot"/>
+    <circle cx="0" cy="48" r="4.5" class="dot"/>
+    <circle cx="0" cy="60" r="4.5" class="dot"/>
+    
+    <circle cx="12" cy="12" r="4.5" class="dot"/>
+    <circle cx="24" cy="24" r="4.5" class="dot"/>
+    <circle cx="36" cy="12" r="4.5" class="dot"/>
+    
+    <circle cx="48" cy="0" r="4.5" class="dot"/>
+    <circle cx="48" cy="12" r="4.5" class="dot"/>
+    <circle cx="48" cy="24" r="4.5" class="dot"/>
+    <circle cx="48" cy="36" r="4.5" class="dot"/>
+    <circle cx="48" cy="48" r="4.5" class="dot"/>
+    <circle cx="48" cy="60" r="4.5" class="dot"/>
+    
+    <!-- Accent indicator dot representing system active state -->
+    <circle cx="24" cy="48" r="4" class="accent-dot"/>
+  </g>
+  
+  <!-- Brand Wordmark -->
+  <text x="95" y="52" class="text-bold">MONODESK</text>
+  <text x="96" y="74" class="text-sub">OPERATING SYSTEM</text>
+</svg>
