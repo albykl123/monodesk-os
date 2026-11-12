@@ -19,8 +19,11 @@ import json
 
 # Setup Environment paths
 SHELL_DIR = os.path.dirname(os.path.abspath(__file__))
+if not os.path.exists(os.path.join(SHELL_DIR, "qml")) and os.path.exists("/usr/share/monodesk/shell/qml"):
+    SHELL_DIR = "/usr/share/monodesk/shell"
 REPO_ROOT = os.path.abspath(os.path.join(SHELL_DIR, "../.."))
 QML_DIR = os.path.join(SHELL_DIR, "qml")
+os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
 
 def check_qt_runtime():
     try:
@@ -36,13 +39,15 @@ def check_qt_runtime():
 runtime = check_qt_runtime()
 
 if runtime == "PyQt6":
-    from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot, pyqtProperty, QTimer, QUrl
-    from PyQt6.QtGui import QGuiApplication
+    from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot, pyqtProperty, QTimer, QUrl, QSize, Qt
+    from PyQt6.QtGui import QGuiApplication, QIcon, QPixmap, QColor, QPainter, QFont
     from PyQt6.QtQml import QQmlApplicationEngine
+    from PyQt6.QtQuick import QQuickImageProvider
 elif runtime == "PySide6":
-    from PySide6.QtCore import QObject, Signal as pyqtSignal, Slot as pyqtSlot, Property as pyqtProperty, QTimer, QUrl
-    from PySide6.QtGui import QGuiApplication
+    from PySide6.QtCore import QObject, Signal as pyqtSignal, Slot as pyqtSlot, Property as pyqtProperty, QTimer, QUrl, QSize, Qt
+    from PySide6.QtGui import QGuiApplication, QIcon, QPixmap, QColor, QPainter, QFont
     from PySide6.QtQml import QQmlApplicationEngine
+    from PySide6.QtQuick import QQuickImageProvider
 else:
     # Graceful fallback handler if Qt6 is being configured in the chroot
     print("[MONODESK Shell] Notice: Qt 6 runtime not detected in current local python environment.")
@@ -160,16 +165,86 @@ class ShellBridge(QObject):
         except Exception:
             pass
 
+def fallback_to_xfce(reason, launch_ui=True):
+    """Safely fall back to XFCE panel & desktop when Qt 6 QML shell cannot start."""
+    print(f"[MONODESK Shell] {reason} Safely falling back to XFCE desktop.")
+    if launch_ui and os.environ.get("DISPLAY"):
+        for binary in ("xfce4-panel", "xfdesktop"):
+            try:
+                chk = subprocess.run(["pgrep", "-x", binary], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if chk.returncode != 0:
+                    subprocess.Popen([binary], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+                    print(f"[MONODESK Shell] Started XFCE fallback component: {binary}")
+            except Exception as exc:
+                print(f"[MONODESK Shell] Notice: could not start {binary}: {exc}")
+
+
+if runtime in ("PyQt6", "PySide6"):
+    class MonodeskIconProvider(QQuickImageProvider):
+        """Resolve image://icon/<name> via QIcon theme lookup with crisp monochrome glyph fallback."""
+        def __init__(self):
+            super().__init__(QQuickImageProvider.ImageType.Pixmap)
+            if not QIcon.themeName():
+                for theme in ("Tango", "Adwaita", "hicolor"):
+                    if os.path.isdir(f"/usr/share/icons/{theme}"):
+                        QIcon.setThemeName(theme)
+                        break
+
+        def requestPixmap(self, icon_id, requested_size):
+            w = requested_size.width() if requested_size.isValid() and requested_size.width() > 0 else 24
+            h = requested_size.height() if requested_size.isValid() and requested_size.height() > 0 else 24
+            candidates = [icon_id]
+            if icon_id == "firefox-esr":
+                candidates.extend(["web-browser", "internet-web-browser"])
+            elif icon_id == "system-file-manager":
+                candidates.extend(["folder", "inode-directory"])
+            for cand in candidates:
+                icon = QIcon.fromTheme(cand)
+                if not icon.isNull():
+                    pm = icon.pixmap(QSize(w, h))
+                    if not pm.isNull():
+                        return pm, pm.size()
+            pm = QPixmap(w, h)
+            pm.fill(QColor(0, 0, 0, 0))
+            painter = QPainter(pm)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            painter.setBrush(QColor("#242426"))
+            painter.setPen(QColor("#3A3A3D"))
+            painter.drawRoundedRect(0, 0, w - 1, h - 1, 5, 5)
+            painter.setPen(QColor("#F4F4F5"))
+            painter.setFont(QFont("Sans", max(8, w // 2), QFont.Weight.Bold))
+            label = (icon_id[:1] or "M").upper()
+            painter.drawText(pm.rect(), Qt.AlignmentFlag.AlignCenter, label)
+            painter.end()
+            return pm, pm.size()
+
+
 def main():
+    check_only = "--check" in sys.argv
     if runtime is None:
-        print("[MONODESK Shell] Error: Qt 6 (PyQt6 or PySide6) is required to run the native shell.")
-        sys.exit(1)
+        fallback_to_xfce("Qt 6 (PyQt6 or PySide6) runtime is unavailable.", launch_ui=not check_only)
+        return 0 if not check_only else 1
 
     app = QGuiApplication(sys.argv)
     app.setApplicationName("MONODESK Shell")
     app.setOrganizationName("MONODESK OS")
 
+    # Prevent duplicate concurrent shell windows across session/autostart triggers
+    lock_fh = None
+    if not check_only and os.name == "posix":
+        try:
+            import fcntl
+            lock_path = f"/tmp/monodesk-shell-{os.getuid()}.lock"
+            lock_fh = open(lock_path, "w")
+            fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            print("[MONODESK Shell] Another instance is already running.", flush=True)
+            return 0
+
+    qml_errors = []
     engine = QQmlApplicationEngine()
+    engine.addImageProvider("icon", MonodeskIconProvider())
+    engine.warnings.connect(lambda errs: qml_errors.extend(str(e.toString()) for e in errs))
     bridge = ShellBridge()
     engine.rootContext().setContextProperty("shellBridge", bridge)
 
@@ -177,10 +252,15 @@ def main():
     engine.load(QUrl.fromLocalFile(main_qml))
 
     if not engine.rootObjects():
-        print("[MONODESK Shell] Failed to load MainShell.qml")
-        sys.exit(1)
+        details = "; ".join(qml_errors) if qml_errors else f"failed to load {main_qml}"
+        fallback_to_xfce(f"QML initialization error ({details}).", launch_ui=not check_only)
+        return 0 if not check_only else 1
 
-    sys.exit(app.exec())
+    print("[MONODESK Shell] QML root window loaded successfully.", flush=True)
+    if check_only:
+        return 0
+
+    return app.exec()
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

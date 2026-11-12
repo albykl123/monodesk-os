@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import "../../../themes" 1.0
+import "../../themes" 1.0
 
 ColumnLayout {
     id: widgetsRoot
@@ -22,7 +22,7 @@ ColumnLayout {
 
             Text {
                 id: clockText
-                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.alignment: Qt.AlignHCenter
                 text: Qt.formatTime(new Date(), "hh:mm:ss")
                 color: MonodeskTheme.textPrimary
                 font.family: MonodeskTheme.fontDisplay
@@ -32,7 +32,7 @@ ColumnLayout {
             }
 
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.alignment: Qt.AlignHCenter
                 text: Qt.formatDate(new Date(), "ddd, dd MMM yyyy").toUpperCase()
                 color: MonodeskTheme.textTertiary
                 font.family: MonodeskTheme.fontDisplay

@@ -14,9 +14,21 @@ mesa-vulkan-drivers
 libgl1-mesa-dri
 libglx-mesa0
 
-# Display Manager
+# Display Manager & MONODESK Qt 6 Shell Stack
 lightdm
 lightdm-gtk-greeter
+python3-pyqt6
+python3-pyqt6.qtqml
+python3-pyqt6.qtquick
+qml6-module-qtquick
+qml6-module-qtquick-window
+qml6-module-qtquick-controls
+qml6-module-qtquick-layouts
+qml6-module-qtquick-templates
+qml6-module-qtqml-models
+libqt6svg6
+qt6-qpa-plugins
+qt6-image-formats-plugins
 
 # XFCE Desktop Suite
 xfce4-session

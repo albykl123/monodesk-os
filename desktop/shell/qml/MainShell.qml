@@ -14,11 +14,17 @@ Window {
     visible: true
     width: Screen.width
     height: Screen.height
-    flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus
-    color: "transparent"
+    flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus | Qt.WindowStaysOnBottomHint
+    color: theme.surfaceBase
 
     // Theme instance
     property var theme: MonodeskTheme
+
+    // Layer 0: Solid theme backing (safe fallback without compositor)
+    Rectangle {
+        anchors.fill: parent
+        color: theme.surfaceBase
+    }
 
     // Layer 1: Desktop Background & Watermark
     Image {
@@ -75,7 +81,8 @@ Window {
         id: notifications
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.margins: 20
+        anchors.topMargin: 296
+        anchors.rightMargin: 28
     }
 
     // Global Shortcut Listener
