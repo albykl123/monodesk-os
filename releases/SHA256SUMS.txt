@@ -1,1 +1,2 @@
-78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c  monodesk-os-1.0.0-universal-amd64.iso
+9779da035e735351cbb4932fab4679ef98661d3d9dd0d8a10c5d25f6198e5371  monodesk-os-1.0.0-universal-amd64.iso
+eb5dbb19c4cf83efe30f5196bf563e8eaeb8d344e373e1f7cef98be4fe103b37  monodesk-os-1.0.1-rc1-universal-amd64.iso

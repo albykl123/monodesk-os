@@ -73,13 +73,23 @@ mountroot() {
 
     echo "MONODESK OS: Locating boot medium..."
     found_dev=""
+    rootfs_img=""
+    rootfs_fs=""
     for try in 1 2 3 4 5 6 7 8 9 10 11 12; do
         for dev in /dev/sr0 /dev/sr1 /dev/sda /dev/sda1 /dev/sdb /dev/sdb1 /dev/vda /dev/vdb /dev/hda /dev/hdc; do
             [ -b "$dev" ] || continue
             if mount -t iso9660 -o ro "$dev" /run/live/medium 2>/dev/null; then
-                if [ -f /run/live/medium/live/filesystem.ext4 ]; then
+                if [ -f /run/live/medium/live/filesystem.squashfs ]; then
                     found_dev="$dev"
-                    echo "MONODESK OS: Boot medium found on ${found_dev}"
+                    rootfs_img="/run/live/medium/live/filesystem.squashfs"
+                    rootfs_fs="squashfs"
+                    echo "MONODESK OS: Boot medium found on ${found_dev} (squashfs)"
+                    break 2
+                elif [ -f /run/live/medium/live/filesystem.ext4 ]; then
+                    found_dev="$dev"
+                    rootfs_img="/run/live/medium/live/filesystem.ext4"
+                    rootfs_fs="ext4"
+                    echo "MONODESK OS: Boot medium found on ${found_dev} (ext4)"
                     break 2
                 fi
                 umount /run/live/medium 2>/dev/null || true
@@ -89,15 +99,15 @@ mountroot() {
     done
 
     if [ -z "$found_dev" ]; then
-        echo "MONODESK OS ERROR: Live boot medium (/live/filesystem.ext4) not found!"
+        echo "MONODESK OS ERROR: Live boot medium (/live/filesystem.squashfs) not found!"
         /bin/sh
         return 1
     fi
 
     [ -b /dev/loop0 ] || mknod /dev/loop0 b 7 0
-    echo "MONODESK OS: Attaching loopback root filesystem..."
-    losetup /dev/loop0 /run/live/medium/live/filesystem.ext4
-    mount -t ext4 -o ro /dev/loop0 /run/live/rootfs
+    echo "MONODESK OS: Attaching loopback root filesystem (${rootfs_fs})..."
+    losetup /dev/loop0 "${rootfs_img}"
+    mount -t "${rootfs_fs}" -o ro /dev/loop0 /run/live/rootfs
 
     echo "MONODESK OS: Creating writable overlay in RAM..."
     mount -t tmpfs -o mode=0755,size=75% tmpfs /run/live/overlay
@@ -124,7 +134,7 @@ mountroot() {
 }
 '''
 
-cpio_path = r'F:\anti\overlay.cpio'
+cpio_path = r'D:\anti\overlay.cpio'
 with open(cpio_path, 'wb') as f:
     # Create all required parent directories
     dirs = [
@@ -148,9 +158,9 @@ with open(cpio_path, 'wb') as f:
     
     # Kernel modules
     modules = [
-        (r'F:\anti\initrd_modules\loop.ko', 'usr/lib/modules/6.1.0-54-amd64/kernel/drivers/block/loop.ko'),
-        (r'F:\anti\initrd_modules\overlay.ko', 'usr/lib/modules/6.1.0-54-amd64/kernel/fs/overlayfs/overlay.ko'),
-        (r'F:\anti\initrd_modules\squashfs.ko', 'usr/lib/modules/6.1.0-54-amd64/kernel/fs/squashfs/squashfs.ko'),
+        (r'D:\anti\initrd_modules\loop.ko', 'usr/lib/modules/6.1.0-54-amd64/kernel/drivers/block/loop.ko'),
+        (r'D:\anti\initrd_modules\overlay.ko', 'usr/lib/modules/6.1.0-54-amd64/kernel/fs/overlayfs/overlay.ko'),
+        (r'D:\anti\initrd_modules\squashfs.ko', 'usr/lib/modules/6.1.0-54-amd64/kernel/fs/squashfs/squashfs.ko'),
     ]
     for src_path, entry_name in modules:
         with open(src_path, 'rb') as mod_f:
@@ -162,8 +172,8 @@ with open(cpio_path, 'wb') as f:
 print('Successfully created aligned overlay.cpio! Size:', os.path.getsize(cpio_path))
 
 # Prepend early uncompressed CPIO BEFORE the zstd compressed Debian base initrd!
-out_initrd = r'F:\anti\iso_staging\live\initrd.img'
-with open(cpio_path, 'rb') as cpio, open(r'F:\anti\initrd_base.img', 'rb') as base, open(out_initrd, 'wb') as out:
+out_initrd = r'D:\anti\iso_staging\live\initrd.img'
+with open(cpio_path, 'rb') as cpio, open(r'D:\anti\initrd_base.img', 'rb') as base, open(out_initrd, 'wb') as out:
     out.write(cpio.read())
     out.write(base.read())
 

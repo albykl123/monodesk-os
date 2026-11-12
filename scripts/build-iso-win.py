@@ -4,6 +4,7 @@ import time
 import shutil
 import hashlib
 import pathlib
+import argparse
 import pycdlib
 
 def make_clean_iso_name(name, is_dir=False, used_names=None):
@@ -45,10 +46,11 @@ def make_clean_iso_name(name, is_dir=False, used_names=None):
         used_names.add(cand)
         return cand
 
-def build_iso():
-    staging_root = pathlib.Path(r'F:\anti\iso_staging')
-    output_iso = pathlib.Path(r'F:\anti\monodesk-os\releases\monodesk-os-1.0.0-universal-amd64.iso')
+def build_iso(staging_root=None, output_iso=None, mirror=True):
+    staging_root = pathlib.Path(staging_root or r'D:\anti\iso_staging')
+    output_iso = pathlib.Path(output_iso or r'D:\anti\monodesk-os\releases\monodesk-os-1.0.0-universal-amd64.iso')
     output_iso.parent.mkdir(parents=True, exist_ok=True)
+    has_squashfs = (staging_root / 'live' / 'filesystem.squashfs').is_file()
     
     print("[*] Initializing PyCdlib for MONODESK OS 1.0 Universal PC Edition...")
     iso = pycdlib.PyCdlib()
@@ -91,7 +93,11 @@ def build_iso():
     for root, dirs, files in os.walk(staging_root):
         root_path = pathlib.Path(root)
         for f in sorted(files):
-            all_files.append(root_path / f)
+            f_path = root_path / f
+            rel = f_path.relative_to(staging_root).as_posix()
+            if has_squashfs and rel == 'live/filesystem.ext4':
+                continue
+            all_files.append(f_path)
             
     print(f"[*] Adding {len(all_files)} files to ISO filesystem...")
     bios_iso_file = None
@@ -121,13 +127,15 @@ def build_iso():
     assert bios_iso_file is not None, "BIOS boot image not found!"
     assert efi_iso_file is not None, "EFI boot image not found!"
 
-    print(f"[*] Registering El Torito BIOS boot record: {bios_iso_file}")
-    iso.add_eltorito(bios_iso_file, platform_id=0, media_name='noemul', boot_load_size=4, boot_info_table=False)
+    bios_size = (staging_root / 'boot' / 'grub' / 'cdboot.img').stat().st_size
+    use_boot_info_table = bios_size > 2048
+    print(f"[*] Registering El Torito BIOS boot record: {bios_iso_file} (size={bios_size}, boot_info_table={use_boot_info_table})")
+    iso.add_eltorito(bios_iso_file, platform_id=0, media_name='noemul', boot_load_size=4, boot_info_table=use_boot_info_table)
 
     print(f"[*] Registering El Torito UEFI boot record: {efi_iso_file}")
     iso.add_eltorito(efi_iso_file, efi=True, platform_id=0xef, media_name='noemul', boot_load_size=0)
 
-    print(f"[*] Writing hybrid bootable ISO directly on Disk F: -> {output_iso}")
+    print(f"[*] Writing hybrid bootable ISO directly on Disk D: -> {output_iso}")
     start_time = time.time()
     iso.write(str(output_iso))
     iso.close()
@@ -135,18 +143,22 @@ def build_iso():
     
     size_bytes = output_iso.stat().st_size
     size_mb = size_bytes / (1024 * 1024)
+    size_gib = size_bytes / (1024 * 1024 * 1024)
     print(f"[✓] ISO generation completed in {elapsed:.2f} seconds!")
-    print(f"[✓] Final ISO Size: {size_mb:.2f} MB ({size_bytes} bytes)")
+    print(f"[✓] Final ISO Size: {size_mb:.2f} MiB ({size_gib:.3f} GiB, {size_bytes} bytes)")
+    assert size_bytes < 2 * 1024 * 1024 * 1024, f"ISO exceeds 2 GiB limit: {size_bytes} bytes"
     
-    # Sync to src directories on Disk F as requested by user
-    targets = [
-        pathlib.Path(r'F:\anti\monodesk-os\src\monodesk-os-1.0.0-universal-amd64.iso'),
-        pathlib.Path(r'F:\anti\src\monodesk-os-1.0.0-universal-amd64.iso'),
-    ]
-    for tgt in targets:
-        tgt.parent.mkdir(parents=True, exist_ok=True)
-        print(f"[*] Mirroring ISO to {tgt}...")
-        shutil.copy2(output_iso, tgt)
+    if mirror:
+        # Sync to Disk D target directories as requested by user
+        targets = [
+            pathlib.Path(r'D:\monodesk-os-1.0.0-universal-amd64.iso'),
+            pathlib.Path(r'D:\anti\src\monodesk-os-1.0.0-universal-amd64.iso'),
+            pathlib.Path(r'D:\anti\monodesk-os\src\monodesk-os-1.0.0-universal-amd64.iso'),
+        ]
+        for tgt in targets:
+            tgt.parent.mkdir(parents=True, exist_ok=True)
+            print(f"[*] Mirroring ISO to {tgt}...")
+            shutil.copy2(output_iso, tgt)
 
     # Compute SHA-256 checksum
     print("[*] Computing SHA-256 verification checksum...")
@@ -157,11 +169,18 @@ def build_iso():
     hex_digest = sha256.hexdigest()
     print(f"[✓] SHA-256: {hex_digest}")
 
-    sha_file = output_iso.parent / 'monodesk-os-1.0.0-universal-amd64.iso.sha256'
-    sha_file.write_text(f"{hex_digest}  monodesk-os-1.0.0-universal-amd64.iso\n", encoding='utf-8')
+    iso_name = output_iso.name
+    sha_file = output_iso.parent / f'{iso_name}.sha256'
+    sha_file.write_text(f"{hex_digest}  {iso_name}\n", encoding='utf-8')
     
-    sums_file = output_iso.parent / 'SHA256SUMS.txt'
-    sums_file.write_text(f"{hex_digest}  monodesk-os-1.0.0-universal-amd64.iso\n", encoding='utf-8')
+    if mirror:
+        sums_file = output_iso.parent / 'SHA256SUMS.txt'
+        sums_file.write_text(f"{hex_digest}  {iso_name}\n", encoding='utf-8')
 
 if __name__ == '__main__':
-    build_iso()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--staging', default=None)
+    parser.add_argument('--output', default=None)
+    parser.add_argument('--no-mirror', action='store_true')
+    args = parser.parse_args()
+    build_iso(staging_root=args.staging, output_iso=args.output, mirror=not args.no_mirror)

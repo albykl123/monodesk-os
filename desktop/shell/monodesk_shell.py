@@ -47,6 +47,17 @@ else:
     # Graceful fallback handler if Qt6 is being configured in the chroot
     print("[MONODESK Shell] Notice: Qt 6 runtime not detected in current local python environment.")
     print("[MONODESK Shell] Ready for deployment in Debian Bookworm image with python3-pyqt6 / qml6-module-qtquick.")
+    QObject = object
+    def pyqtSignal(*args, **kwargs):
+        return None
+    def pyqtSlot(*args, **kwargs):
+        return lambda fn: fn
+    def pyqtProperty(*args, **kwargs):
+        return lambda fn: fn
+    QTimer = object
+    QUrl = object
+    QGuiApplication = object
+    QQmlApplicationEngine = object
 
 class ShellBridge(QObject):
     """Bridge between QML desktop UI and underlying Linux system services."""

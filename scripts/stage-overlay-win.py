@@ -2,8 +2,8 @@ import os
 import shutil
 import pathlib
 
-repo = pathlib.Path(r'F:\anti\monodesk-os')
-overlay = pathlib.Path(r'F:\anti\iso_staging\monodesk\rootfs_overlay')
+repo = pathlib.Path(r'D:\anti\monodesk-os')
+overlay = pathlib.Path(r'D:\anti\iso_staging\monodesk\rootfs_overlay')
 
 if overlay.exists():
     shutil.rmtree(overlay)
@@ -141,7 +141,7 @@ serial_getty_dir.mkdir(parents=True, exist_ok=True)
 )
 
 # Documentation copy into /monodesk/docs
-doc_dst = pathlib.Path(r'F:\anti\iso_staging\monodesk\docs')
+doc_dst = pathlib.Path(r'D:\anti\iso_staging\monodesk\docs')
 doc_dst.mkdir(parents=True, exist_ok=True)
 for doc_file in (repo / 'docs').glob('*.md'):
     shutil.copy2(doc_file, doc_dst / doc_file.name)

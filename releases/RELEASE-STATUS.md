@@ -1,43 +1,27 @@
-# MONODESK OS 1.0 — Release Status & Acceptance Verification Report
+# MONODESK OS — Release Status & Validation Summary
 
-**Release Edition:** MONODESK OS 1.0 (Universal PC Edition)  
-**Target Release Tag:** `v1.0.0`  
-**Base Distribution:** Debian GNU/Linux 12 (Bookworm) AMD64  
-**Desktop Environment:** XFCE 4.18 with Custom MONODESK Qt 6 Shell  
-**Default Kernel:** Linux 6.1 LTS (with Intel & AMD universal microcode)  
-**Status Date:** 2026-11-11  
+**Published Release:** `v1.0.0` (`monodesk-os-1.0.0-universal-amd64.iso`, preserved intact on GitHub Releases and Disk D)  
+**Validation Candidate:** `v1.0.1-rc1` (`monodesk-os-1.0.1-rc1-universal-amd64.iso`, local defect-fix candidate)  
+**Base Distribution:** Debian GNU/Linux 12 (Bookworm) AMD64 (`6.1.0-54-amd64`)  
+**Source Tag / Commit:** `v1.0.0` (`ae5c52b8c18b75b91ed51718b11dc1df5a79aaeb` -> `af12f8bed5a590e63b3dfb7003934b51a43b4470`)  
+**Validation Date:** 2026-11-12  
 
 ---
 
-## 1. Release Acceptance Gate Checklist
+## Release Gate Comparison (`v1.0.0` Published vs `v1.0.1-rc1` Candidate)
 
-| Acceptance Criteria | Target Component | Method | Gate Status |
+| Check / Gate | `v1.0.0` (Published, Preserved) | `v1.0.1-rc1` (Local Candidate) | Evidence / Notes |
 | :--- | :--- | :--- | :--- |
-| **Universal ISO Generation** | `releases/monodesk-os-1.0.0-universal-amd64.iso` | `scripts/build-iso-win.py` (PyCdlib AMD64) | **GENERATED (3,268,114,432 BYTES)** |
-| **ISO Integrity & Plausibility** | ISO volume headers & Disk F mirrors | `PyCdlib` + `Get-Item` across 3 Disk F paths | **VERIFIED** |
-| **SHA-256 Checksum** | `SHA256SUMS.txt` / `.sha256` | `78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c` | **VERIFIED (`Get-FileHash`)** |
-| **UEFI Boot Verification** | Hybrid OVMF firmware (`q35` + EDK2) | QEMU x86_64 UEFI live boot (`task-2377`) | **PASSED (LIVE SYSTEMD + OVERLAYFS)** |
-| **Legacy BIOS Boot Verification**| El Torito `cdboot.img` MBR entry | ISO El Torito BIOS boot record | **REGISTERED (QEMU BIOS UNTESTED)** |
-| **Live Desktop Environment** | Headless base rootfs + overlay | Layered `/etc/calamares`, themes, `graphical.target` | **STAGED (`0.img` BASE CLI ONLY)** |
-| **MONODESK Desktop Shell** | Qt 6 / QML Shell & Taskbar | `monodesk-shell` staged in overlay | **SYNTAX & STAGING VERIFIED** |
-| **Hardware Detection Service** | CPU, RAM, GPU, Net, Audio, Power | `/usr/bin/monodesk-hw-detect --report` in live QEMU | **PASSED (LIVE + UNIT TESTS)** |
-| **Standard Profile Integration**| 8GB+ RAM, full compositing | `monodesk-profile-ctl` | **PASSED (UNIT TESTS)** |
-| **Lite Profile Integration** | 4GB RAM, low-overhead zram | `monodesk-profile-ctl` + live `1959 MB` QEMU test | **PASSED (LIVE + UNIT TESTS)** |
-| **Core Application Suite** | 23 first-party apps + 30 `/usr/bin/monodesk-*` bins | Pytest suite + live `/usr/bin` inspection | **PASSED (32 TESTS)** |
-| **Calamares Installer** | LUKS, partition, unpackfs configs | `/etc/calamares` staged in live overlay | **STAGED (INTERACTIVE GUI UNTESTED)** |
-| **Disposable Disk Installation** | `vm-disposable-test.qcow2` (25GB) | Exposed as `/dev/vda` during QEMU UEFI live test | **LIVE DETECTED (INSTALL NOT EXECUTED)** |
-| **Installed System Boot** | GRUB EFI / vmlinuz / initrd | Reboot from installed disposable disk | **DEFERRED (CLI BASE ROOTFS)** |
-| **Recovery Environment** | `monodesk-recovery` + GRUB safe stanza | Safe Graphics stanza & CLI recovery binary staged | **STAGED & VERIFIED IN GRUB** |
-| **Package Manifest (SBOM)** | `PACKAGE-MANIFEST.txt` | 309 entries (28 MONODESK + 281 Debian Bookworm) | **GENERATED** |
-| **Build Manifest** | `BUILD-MANIFEST.json` / `BUILD-MANIFEST.txt` | Release build metadata & Disk F paths | **GENERATED** |
-| **Release Notes** | `RELEASE-NOTES.md` | Feature breakdown & guides | **COMPLETE** |
-| **Known Limitations** | `KNOWN-LIMITATIONS.md` | Architectural boundaries | **COMPLETE** |
-| **Release Directory Integrity** | `releases/` & `src/` Disk F artifacts | ISO + SHA256SUMS + manifests verified | **COMPLETE (DEPLOYED TO DISK F)** |
+| **Single Unsplit ISO < 2 GiB** | **PASSED** (`419,575,808` B / `400.14 MiB`) | **PASSED** (`687,063,040` B / `655.23 MiB`) | Verified across Disk D paths (`v1.0.0`) & `releases/` |
+| **GitHub Download SHA-256 Match** | **PASSED** (`9779da03...`) | N/A (local RC1 only) | Downloaded `gh release download` matched local ISO |
+| **GitHub Release Asset Completeness** | **PARTIAL** (2 of 7 local assets) | N/A | Only `.iso` and `.iso.sha256` on GitHub `v1.0.0` |
+| **QEMU UEFI Live Boot (`q35` + OVMF)** | **PASSED** | **PASSED** | Live `squashfs` + `overlayfs` booted cleanly |
+| **Legacy BIOS Boot (QEMU SeaBIOS)** | **FAILED** (`no boot info`) | **PASSED** (`BOOT_MODE=LEGACY_BIOS`) | Fixed via 159,675 B `cdboot_eltorito.img` + `boot_info_table=True` |
+| **Calamares Installer Execution** | **FAILED** (`calamares` missing) | **PASSED** (`25 GiB` qcow2 GPT + EFI + ext4) | Verified end-to-end GUI install onto `test-disposable-install.qcow2` |
+| **Installed System Boot (No ISO)** | **FAILED** (not installable) | **PASSED** (UEFI boot from `/dev/vda2`) | `/etc/fstab`, user `monodesk`, `lightdm`, `monodesk-profile` verified |
+| **GUI Stack (Xorg/XFCE4/LightDM)** | **FAILED** (CLI base only) | **PASSED** (`lightdm` + `Xorg :0` active) | `GTK3_GI_OK` verified; `PyQt6.QtQml` still absent (graceful fallback) |
+| **Standard & Lite Profile Switching** | **PARTIAL** (CTL + `profile.conf` only) | **PASSED** (4 GB->Lite / 8 GB->Standard) | Verified `zram0` (`1.9G` <-> `977.2M`) and `powerprofilesctl` |
+| **Host Python Unit Test Suite** | **PASSED** (32 tests) | **PASSED** (32 tests in `1.65s`) | `pytest -v` on `D:\anti\monodesk-os\tests` |
+| **Physical Lenovo Slim 5 & B590** | **UNVERIFIED** | **UNVERIFIED** | Pending manual physical hardware testing |
 
----
-
-## 2. Hardware Architecture & Scope Statement
-
-- **Universal AMD64 PC Edition:** MONODESK OS 1.0 ships as **ONE UNIVERSAL HYBRID ISO** capable of booting on standard Intel and AMD 64-bit personal computers.
-- **Physical Validation Targets:** The Lenovo IdeaPad Slim 5 (modern AMD Ryzen 7) and Lenovo B590 (legacy Intel Sandy Bridge) serve as initial reference architecture validation profiles for Standard and Lite configurations.
-- **Non-Destructive Testing Guarantee:** All autonomous operating-system installation and filesystem testing is strictly restricted to isolated, disposable virtual disks (`vm-disposable-test.qcow2`). No physical partitions or host drives are modified.
+See [FINAL-VALIDATION-REPORT.md](FINAL-VALIDATION-REPORT.md) for the complete breakdown of Verified Results, Unverified Claims, Source Reconciliation against `af12f8b`, Failures & Fixes, and Remaining Limitations.

@@ -6,23 +6,77 @@
   "base_os": "Debian GNU/Linux 12 (Bookworm)",
   "kernel": "6.1.0-54-amd64",
   "release_tag": "v1.0.0",
-  "build_timestamp": "2026-11-11T15:46:36Z",
-  "build_host": "Disk F Direct Hybrid ISO Pipeline (PyCdlib 1.16.0)",
+  "source_commit": "af12f8bed5a590e63b3dfb7003934b51a43b4470",
+  "source_tag_object": "ae5c52b8c18b75b91ed51718b11dc1df5a79aaeb",
+  "source_tree_note": "v1.0.0 ISO was built from Disk D staging using post-af12f8b squashfs migration scripts preserved at D:\\anti\\prepare_live_initrd.py (sha256 prefix 822f152ef455) and D:\\anti\\build_monodesk_universal_iso.py (sha256 prefix 55523b2ad763); repo scripts/ and releases/ were reconciled post-release.",
+  "build_timestamp": "2026-11-12T09:02:50Z",
+  "build_environment": {
+    "host_os": "Windows-11-10.0.26300-SP0",
+    "python": "3.14.7",
+    "iso_mastering": "PyCdlib 1.16.0",
+    "squashfs_builder": "QEMU x86_64 ephemeral snapshot VM (C:\\anti\\debian-builder.qcow2) running Debian 12 mksquashfs -comp xz -b 1M -noappend -processors 4",
+    "wsl2_status": "Unavailable on host (WSL_E_DISK_CORRUPTED); bypassed cleanly via QEMU Debian builder VM"
+  },
   "iso_filename": "monodesk-os-1.0.0-universal-amd64.iso",
   "iso_paths": [
-    "F:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.0-universal-amd64.iso",
-    "F:\\anti\\monodesk-os\\src\\monodesk-os-1.0.0-universal-amd64.iso",
-    "F:\\anti\\src\\monodesk-os-1.0.0-universal-amd64.iso"
+    "D:\\monodesk-os-1.0.0-universal-amd64.iso",
+    "D:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.0-universal-amd64.iso",
+    "D:\\anti\\src\\monodesk-os-1.0.0-universal-amd64.iso",
+    "D:\\anti\\monodesk-os\\src\\monodesk-os-1.0.0-universal-amd64.iso"
   ],
-  "iso_bytes": 3268114432,
-  "sha256": "78c7b9cdda62343209a95dd422d83141fc3350f52794d018e5d26bcab1ce904c",
-  "boot_verification": {
-    "uefi_ovmf_qemu": "PASSED",
-    "grub_menu": "PASSED",
-    "live_overlayfs_mount": "PASSED",
-    "systemd_graphical_target": "PASSED",
+  "iso_bytes": 419575808,
+  "squashfs_bytes": 237420544,
+  "squashfs_sha256": "6113dd67ddcb9dc7c5b14eb5c3717a13d3e4675db5ab712add98ab026d6c4fde",
+  "sha256": "9779da035e735351cbb4932fab4679ef98661d3d9dd0d8a10c5d25f6198e5371",
+  "github_release": {
+    "repository": "albykl123/monodesk-os",
+    "tag": "v1.0.0",
+    "url": "https://github.com/albykl123/monodesk-os/releases/tag/v1.0.0",
+    "published_at": "2026-11-12T09:07:26Z",
+    "assets_uploaded": [
+      "monodesk-os-1.0.0-universal-amd64.iso",
+      "monodesk-os-1.0.0-universal-amd64.iso.sha256"
+    ],
+    "downloaded_asset_sha256_verified": true
+  },
+  "v1_0_0_verification": {
+    "uefi_ovmf_qemu_live_boot": "PASSED",
+    "live_squashfs_overlayfs_mount": "PASSED",
+    "legacy_bios_seabios_boot": "FAILED (SeaBIOS 'no boot info'; 2048-byte cdboot.img lacked GRUB core.img and boot_info_table=True)",
+    "calamares_installer": "FAILED (calamares binary not installed in v1.0.0 CLI base squashfs)",
+    "graphical_desktop_xorg_xfce": "FAILED (Xorg, XFCE4, LightDM, Qt 6, PyGObject not installed in v1.0.0 CLI base squashfs)",
+    "monodesk_shell_startup": "FAILED (NameError: name 'QObject' is not defined without PyQt6/PySide6)",
+    "monodesk_profile_service": "FAILED (disabled / inactive at boot; missing zramswap & powerprofilesctl)",
+    "monodesk_profile_ctl_recommend_and_conf": "PARTIAL_PASS (4096MB->LITE, 8192MB->STANDARD, /etc/monodesk/profile.conf updated)",
     "hw_detect_in_live_vm": "PASSED",
-    "disposable_disk_attached": "vm-disposable-test.qcow2 (25G)"
+    "physical_hardware_certification": "UNVERIFIED (Lenovo IdeaPad Slim 5 & Lenovo B590 not physically tested)"
+  },
+  "release_candidate_v1_0_1_rc1": {
+    "version": "1.0.1-rc1",
+    "iso_filename": "monodesk-os-1.0.1-rc1-universal-amd64.iso",
+    "iso_path": "D:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.1-rc1-universal-amd64.iso",
+    "iso_bytes": 687063040,
+    "squashfs_bytes": 504745984,
+    "sha256": "eb5dbb19c4cf83efe30f5196bf563e8eaeb8d344e373e1f7cef98be4fe103b37",
+    "fixes_included": [
+      "Rebuilt El Torito BIOS boot image (159,675-byte cdboot_eltorito.img with GRUB i386-pc core.img + boot_info_table=True)",
+      "Installed Calamares 3.2.61-1+b1, fdisk/sfdisk, parted, udisks2, gdisk, dosfstools, cryptsetup, grub-efi-amd64, grub-pc-bin",
+      "Installed Xorg, XFCE4, LightDM, Python3-PyQt6, Python3-GI GTK3, zram-tools, power-profiles-daemon, NetworkManager",
+      "Added Qt fallback stubs in desktop/shell/monodesk_shell.py to eliminate NameError without QML bindings",
+      "Fixed monodesk-profile.service systemd symlink in squashfs (removed regular-file override in rootfs_overlay)"
+    ],
+    "verification": {
+      "legacy_bios_seabios_boot": "PASSED (BOOT_MODE=LEGACY_BIOS, squashfs+overlayfs, lightdm/udisks2/monodesk-profile active)",
+      "calamares_uefi_disposable_install": "PASSED (25 GiB D:\\anti\\test-disposable-install.qcow2 GPT + 512 MiB EFI FAT32 + ext4 + GRUB EFI)",
+      "installed_system_direct_boot_no_iso": "PASSED (/dev/vda2 root ext4, /dev/vda1 /boot/efi vfat, user monodesk uid 1000, lightdm running)",
+      "profile_lite_4gb_auto_and_zram": "PASSED (4096 MB auto->lite, zram0 1.9G, powerprofilesctl power-saver)",
+      "profile_standard_8gb_auto_and_switch": "PASSED (8192 MB auto->standard, set standard/lite toggles zram0 977.2M<->1.9G & balanced<->power-saver)",
+      "remaining_rc1_limitations": [
+        "python3-pyqt6.qtquick not yet installed (PyQt6.QtQml missing; monodesk_shell.py exits gracefully while LightDM/XFCE4 runs)",
+        "Live root autologin getty drop-ins in /etc/systemd/system/{getty@tty1,serial-getty@ttyS0}.service.d persisted onto installed disk",
+        "Physical hardware (Lenovo IdeaPad Slim 5 & Lenovo B590) remains untested"
+      ]
+    }
   },
   "profiles": [
     {
