@@ -1,53 +1,44 @@
-# MONODESK OS 1.0 — Official Release Notes
-## Edition: Universal PC Edition (Release 1.0.0)
+# MONODESK OS 1.0.1 — Official Release Notes
+## Edition: Universal PC Edition (Production Release 1.0.1)
 
-**Release Date:** 2026-11-11  
+**Release Tag:** `v1.0.1`  
+**Release Date:** 2026-11-12  
 **Architecture:** x86-64 / AMD64  
 **Base Distribution:** Debian 12 "Bookworm" LTS  
-**Desktop Environment:** XFCE 4.18 with MONODESK Shell  
-**Default Kernel:** Linux 6.1 LTS with Universal Microcode
+**Desktop Environment:** MONODESK Shell (Qt 6 / QML) + XFCE 4.18 Fallback  
+**Default Kernel:** Linux 6.1 LTS (`6.1.0-54-amd64`) with Universal Microcode
 
 ---
 
-### Highlights of MONODESK OS 1.0
+### What Was Fixed in MONODESK OS 1.0.1
 
-The MONODESK Project is proud to announce the initial production release of **MONODESK OS 1.0 — Universal PC Edition**. Engineered from the ground up as an independent, lightweight, desktop-first Linux operating system, MONODESK OS delivers a cohesive monochrome dot-matrix aesthetic combined with rock-solid Debian enterprise stability.
+MONODESK OS `1.0.1` resolves all remaining blockers identified during `v1.0.0` validation and `v1.0.1-rc1` testing while preserving `v1.0.0` and `v1.0.1-rc1` intact:
 
-#### 1. Universal PC Hardware Support
-- Dual-family CPU support across Intel (Nehalem, Sandy Bridge through modern Raptor Lake/Meteor Lake) and AMD (Ryzen 1000 through 7000, Athlon 64, EPYC).
-- Microcode updates embedded directly into the initramfs for Intel and AMD CPUs.
-- Out-of-the-box hardware acceleration for Intel HD/UHD/Iris graphics and AMD Radeon/Vega/RDNA GPUs via Mesa and Linux DRM.
-- Dedicated `monodesk-nvidia-installer` utility for one-click setup of proprietary NVIDIA drivers with DKMS.
+#### 1. MONODESK Shell (Qt 6 / QML) + Verified XFCE Fallback
+- Packaged missing Bookworm Qt 6 / QML dependencies (`python3-pyqt6.qtquick`, `python3-pyqt6.qtqml`, `qml6-module-qtquick{,-window,-controls,-layouts,-templates}`, `qml6-module-qtqml-models`).
+- Added QML module `qmldir` descriptors (`themes/qmldir`, `desktop/{dock,launcher,quick-search,control-centre,notifications,widgets}/qml/qmldir`) and fixed relative theme imports (`../../themes`) so `MonodeskTheme` resolves across every overlay and widget.
+- Added `MonodeskIconProvider`, `Qt.WindowStaysOnBottomHint`, single-instance `fcntl` guard, and non-overlapping notification card spacing in `monodesk-shell`.
+- Fixed `xfce4-session.xml` (`FailsafeSessionName` + `Count=2` with `xfwm4` and `xfsettingsd`), eliminating XFCE session error dialogs and auto-starting `monodesk-shell` inside `Xorg :0`.
+- Verified graceful fallback to `xfce4-panel` + `xfdesktop` (`rc=0`, no crash) when Qt bindings are unavailable.
 
-#### 2. Dual Performance Profiles
-- **MONODESK Lite:** Engineered for 4 GB RAM systems (such as the Lenovo B590 benchmark target), older dual-core processors, and SATA HDD/SSD hardware. Disables heavy desktop compositing, stops indexing daemons, and engages high-efficiency zram memory compression, targeting an idle footprint of ~700–900 MB RAM.
-- **MONODESK Standard:** Full desktop compositing, window shadows, and desktop telemetry widget for modern PCs with 8 GB RAM or more (such as the Lenovo IdeaPad Slim 5).
-- Dynamically toggleable via `monodesk-profile-ctl` without reinstalling.
+#### 2. Installed-System Hardening & Live User Lifecycle
+- Packaged `user-setup` and clean Unix-LF `/etc/live/config.conf.d/10-monodesk.conf` so live sessions boot as non-root `monodesk` rather than root autologin.
+- Added Calamares `shellprocess@cleanup` (`shellprocess-cleanup.conf`) executing before `displaymanager` to delete any `getty@tty1.service.d`, `serial-getty@ttyS0.service.d`, live sudoers (`99-monodesk-live`, `live`), live LightDM autologin configs, and `/etc/live/config.conf.d`, lock `root` (`passwd -l root`), and enforce LightDM GTK greeter on installed systems.
+- Verified after fresh reboot with no ISO attached: non-root login (`monodesk`), password-enforced `sudo`, disabled `sudo -n`, locked `root`, and active LightDM greeter without autologin.
 
-#### 3. Custom Native Desktop Suite (Python 3 / GTK 3)
-- **MONODESK Shell & Taskbar:** Polished bottom dock featuring an integrated dot-matrix clock, Whisker menu, PipeWire volume control, NetworkManager integration, and battery telemetry.
-- **MONODESK Welcome:** First-boot onboarding assistant guiding users through performance profile selection, hardware diagnostics, and network configuration.
-- **MONODESK Control Centre:** Unified quick-settings panel for Wi-Fi, Bluetooth, audio outputs, display brightness, power profiles, and theme toggling.
-- **MONODESK Hardware Report:** Comprehensive diagnostic inspection tool with automatic privacy scrubbing of MAC addresses, device serials, and disk UUIDs.
-- **MONODESK System Monitor:** Real-time resource inspector for CPU cores, RAM, zRAM, and process tree.
-- **MONODESK Update Manager & Software Manager:** Safe package management preventing accidental removal of critical core packages.
-
-#### 4. Calamares Graphical Installation Pipeline
-- Bootable live desktop with one-click installation to internal NVMe/SATA drives.
-- Automated disk partitioning, dual-boot alongside existing Windows installations, and manual partitioning.
-- Optional full-disk LUKS2 encryption.
-- Seamless dual-mode bootloader installation for modern UEFI (x86_64-efi) and legacy BIOS (i386-pc) systems.
-
-#### 5. Zero-Telemetry & Hardened Security
-- 100% Zero telemetry, zero analytics tracking, and no external phoning home.
-- Default inbound DROP firewall policy powered by UFW.
-- Verified cryptographic signatures for all Debian repository packages.
+#### 3. Preserved Core Features
+- Hybrid **UEFI (`x86_64-efi`) + Legacy BIOS (`i386-pc`)** boot support on a single `730.90 MiB` (`766,408,704` bytes) unsplit ISO.
+- Automatic hardware detection (`monodesk-hw-detect`) and dynamic **Standard** (`8 GB+`, balanced governor, compositor active, 25% zRAM) vs **Lite** (`4 GB`, conservative governor, compositor off, 50% zRAM) profile switching via `monodesk-profile-ctl`.
+- Calamares 3.2.61 graphical installation workflow and Safe Graphics / Hardware Recovery GRUB boot stanza + `monodesk-recovery`.
 
 ---
 
-### Verification & Checksums
+### Hardware Certification Notice
+Virtual end-to-end validation (QEMU OVMF UEFI, QEMU SeaBIOS Legacy BIOS, disposable GPT/EFI Calamares installation, post-install reboots, MONODESK Shell Xorg rendering, XFCE fallback, and 35 automated pytest tests) has passed on `1.0.1`. **Physical hardware testing on the Lenovo IdeaPad Slim 5 and Lenovo B590 remains pending.**
 
-- **Target ISO:** `monodesk-os-1.0.0-universal-amd64.iso`
-- **Checksum File:** `releases/monodesk-os-1.0.0-universal-amd64.iso.sha256`
-- **Build Manifest:** `releases/BUILD-MANIFEST.txt`
-- **Package Manifest:** `releases/PACKAGE-MANIFEST.txt`
+---
+
+### Verification & Checksums (`v1.0.1`)
+- **ISO File:** `monodesk-os-1.0.1-universal-amd64.iso` (`766,408,704` bytes / `730.90 MiB`)
+- **SHA-256:** `3b8ad75a7f3d011d591d30b42efbb48d7edb53a316a642d7ea8465105c219776`
+- **Artifacts:** `SHA256SUMS.txt`, `BUILD-MANIFEST.json`, `PACKAGE-MANIFEST.txt`, `FINAL-VALIDATION-REPORT.md`

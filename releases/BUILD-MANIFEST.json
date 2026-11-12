@@ -1,81 +1,82 @@
 {
   "project": "MONODESK OS",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "edition": "Universal PC Edition",
   "architecture": "x86_64",
   "base_os": "Debian GNU/Linux 12 (Bookworm)",
   "kernel": "6.1.0-54-amd64",
-  "release_tag": "v1.0.0",
-  "source_commit": "af12f8bed5a590e63b3dfb7003934b51a43b4470",
-  "source_tag_object": "ae5c52b8c18b75b91ed51718b11dc1df5a79aaeb",
-  "source_tree_note": "v1.0.0 ISO was built from Disk D staging using post-af12f8b squashfs migration scripts preserved at D:\\anti\\prepare_live_initrd.py (sha256 prefix 822f152ef455) and D:\\anti\\build_monodesk_universal_iso.py (sha256 prefix 55523b2ad763); repo scripts/ and releases/ were reconciled post-release.",
-  "build_timestamp": "2026-11-12T09:02:50Z",
+  "release_tag": "v1.0.1",
+  "source_commit": "e0efd886af79b8f8c7db62f8adf1e14b177efb05",
+  "build_timestamp": "2026-11-12T13:51:50Z",
   "build_environment": {
     "host_os": "Windows-11-10.0.26300-SP0",
     "python": "3.14.7",
     "iso_mastering": "PyCdlib 1.16.0",
-    "squashfs_builder": "QEMU x86_64 ephemeral snapshot VM (C:\\anti\\debian-builder.qcow2) running Debian 12 mksquashfs -comp xz -b 1M -noappend -processors 4",
+    "squashfs_builder": "QEMU x86_64 Debian 12 builder VM running mksquashfs -comp zstd -Xcompression-level 9 -b 262144 -noappend",
     "wsl2_status": "Unavailable on host (WSL_E_DISK_CORRUPTED); bypassed cleanly via QEMU Debian builder VM"
   },
-  "iso_filename": "monodesk-os-1.0.0-universal-amd64.iso",
+  "iso_filename": "monodesk-os-1.0.1-universal-amd64.iso",
   "iso_paths": [
-    "D:\\monodesk-os-1.0.0-universal-amd64.iso",
-    "D:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.0-universal-amd64.iso",
-    "D:\\anti\\src\\monodesk-os-1.0.0-universal-amd64.iso",
-    "D:\\anti\\monodesk-os\\src\\monodesk-os-1.0.0-universal-amd64.iso"
+    "D:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.1-universal-amd64.iso"
   ],
-  "iso_bytes": 419575808,
-  "squashfs_bytes": 237420544,
-  "squashfs_sha256": "6113dd67ddcb9dc7c5b14eb5c3717a13d3e4675db5ab712add98ab026d6c4fde",
-  "sha256": "9779da035e735351cbb4932fab4679ef98661d3d9dd0d8a10c5d25f6198e5371",
+  "iso_bytes": 766408704,
+  "iso_mib": 730.90,
+  "squashfs_bytes": 583917568,
+  "squashfs_sha256": "a418a38466180c864b77243f236447255a474a76b51eae89d4c6ee226f84c949",
+  "sha256": "3b8ad75a7f3d011d591d30b42efbb48d7edb53a316a642d7ea8465105c219776",
+  "dpkg_package_count": 761,
   "github_release": {
     "repository": "albykl123/monodesk-os",
-    "tag": "v1.0.0",
-    "url": "https://github.com/albykl123/monodesk-os/releases/tag/v1.0.0",
-    "published_at": "2026-11-12T09:07:26Z",
-    "assets_uploaded": [
-      "monodesk-os-1.0.0-universal-amd64.iso",
-      "monodesk-os-1.0.0-universal-amd64.iso.sha256"
-    ],
-    "downloaded_asset_sha256_verified": true
+    "tag": "v1.0.1",
+    "url": "https://github.com/albykl123/monodesk-os/releases/tag/v1.0.1",
+    "assets": [
+      "monodesk-os-1.0.1-universal-amd64.iso",
+      "monodesk-os-1.0.1-universal-amd64.iso.sha256",
+      "SHA256SUMS.txt",
+      "BUILD-MANIFEST.json",
+      "PACKAGE-MANIFEST.txt",
+      "RELEASE-NOTES.md",
+      "FINAL-VALIDATION-REPORT.md"
+    ]
   },
-  "v1_0_0_verification": {
-    "uefi_ovmf_qemu_live_boot": "PASSED",
-    "live_squashfs_overlayfs_mount": "PASSED",
-    "legacy_bios_seabios_boot": "FAILED (SeaBIOS 'no boot info'; 2048-byte cdboot.img lacked GRUB core.img and boot_info_table=True)",
-    "calamares_installer": "FAILED (calamares binary not installed in v1.0.0 CLI base squashfs)",
-    "graphical_desktop_xorg_xfce": "FAILED (Xorg, XFCE4, LightDM, Qt 6, PyGObject not installed in v1.0.0 CLI base squashfs)",
-    "monodesk_shell_startup": "FAILED (NameError: name 'QObject' is not defined without PyQt6/PySide6)",
-    "monodesk_profile_service": "FAILED (disabled / inactive at boot; missing zramswap & powerprofilesctl)",
-    "monodesk_profile_ctl_recommend_and_conf": "PARTIAL_PASS (4096MB->LITE, 8192MB->STANDARD, /etc/monodesk/profile.conf updated)",
-    "hw_detect_in_live_vm": "PASSED",
-    "physical_hardware_certification": "UNVERIFIED (Lenovo IdeaPad Slim 5 & Lenovo B590 not physically tested)"
+  "v1_0_1_remediation_changes": [
+    "Installed python3-pyqt6.qtquick (6.4.2-1), python3-pyqt6.qtqml (6.4.2-1), qml6-module-qtquick{,-window,-controls,-layouts,-templates}, qml6-module-qtqml-models, and dependencies in squashfs rootfs",
+    "Added qmldir module definitions for themes and all 6 MONODESK QML subcomponents (dock, launcher, quick-search, control-centre, notifications, widgets) and corrected relative '../../themes' imports",
+    "Added MonodeskIconProvider (QQuickImageProvider), Qt.WindowStaysOnBottomHint, single-instance fcntl flock guard, non-overlapping NotificationCenter margins, and XFCE panel/desktop fallback on Qt unavailability in monodesk-shell",
+    "Fixed xfce4-session.xml FailsafeSessionName and Count=2 (xfwm4, xfsettingsd) so XFCE session boots cleanly and launches monodesk-shell via XDG autostart without session error dialogs",
+    "Installed user-setup (1.95) and Unix-LF /etc/live/config.conf.d/10-monodesk.conf so live sessions run as non-root user monodesk with passwordless live sudo while root password remains locked",
+    "Added Calamares shellprocess@cleanup module (shellprocess-cleanup.conf) to purge getty@tty1/serial-getty@ttyS0 drop-ins, live sudoers, live LightDM autologin, /etc/live/config.conf.d, lock root, and enforce LightDM GTK greeter on installed systems"
+  ],
+  "v1_0_1_verification": {
+    "uefi_ovmf_qemu_live_boot": "PASSED (BOOT_MODE=UEFI, squashfs + overlayfs mounted, user monodesk)",
+    "legacy_bios_seabios_live_boot": "PASSED (BOOT_MODE=LEGACY_BIOS, 5/5 services active, PyQt6 QtQml/QtQuick OK)",
+    "monodesk_shell_xorg_rendering": "PASSED (PyQt6.QtQml/QtQuick 6.4.2, 'QML root window loaded successfully', verified via D:\\anti\\shell_xorg.png)",
+    "xfce_fallback": "PASSED (simulated missing PyQt6/PySide6 returned rc=0, started xfce4-panel and xfdesktop)",
+    "calamares_installer_disposable_disk": "PASSED (25 GiB D:\\anti\\test-disposable-101.qcow2 GPT + 512 MiB FAT32 EFI + ext4 root + GRUB EFI MONODESK_OS + shellprocess@cleanup)",
+    "installed_system_direct_boot_no_iso": "PASSED (verified across two QEMU UEFI boots at 8192 MB and 4096 MB RAM with no ISO attached)",
+    "security_installed_nonroot_no_root_autologin": "PASSED (monodesk/MonodeskTest2026! login, sudo -n true blocked rc=1, sudo -S id ok, root locked L, LightDM greeter active without autologin, all live drop-ins absent)",
+    "profile_switching_and_zram": "PASSED (8192 MB Standard zram0=2031308 KiB <-> Lite zram0=4062616 KiB; 4096 MB auto->Lite zram0=2001312 KiB)",
+    "application_launch": "PASSED (monodesk-welcome, monodesk-recovery, monodesk-hardware-report in live Xorg :0; monodesk-shell & monodesk-welcome in installed Xvfb :98)",
+    "recovery": "PASSED (GRUB 'Safe Graphics / Hardware Recovery Mode' stanza + monodesk-recovery launch)",
+    "network_services": "PASSED_WITH_NOTE (NetworkManager & ufw active; enp0s2 reported unmanaged in nmcli under Debian default 10-globally-managed-devices.conf)",
+    "automated_pytest_suite": "PASSED (35 passed in 2.90s on D:\\anti\\monodesk-os\\tests)",
+    "physical_hardware_certification": "UNVERIFIED (Lenovo IdeaPad Slim 5 & Lenovo B590 pending manual hardware testing)"
   },
-  "release_candidate_v1_0_1_rc1": {
-    "version": "1.0.1-rc1",
-    "iso_filename": "monodesk-os-1.0.1-rc1-universal-amd64.iso",
-    "iso_path": "D:\\anti\\monodesk-os\\releases\\monodesk-os-1.0.1-rc1-universal-amd64.iso",
-    "iso_bytes": 687063040,
-    "squashfs_bytes": 504745984,
-    "sha256": "eb5dbb19c4cf83efe30f5196bf563e8eaeb8d344e373e1f7cef98be4fe103b37",
-    "fixes_included": [
-      "Rebuilt El Torito BIOS boot image (159,675-byte cdboot_eltorito.img with GRUB i386-pc core.img + boot_info_table=True)",
-      "Installed Calamares 3.2.61-1+b1, fdisk/sfdisk, parted, udisks2, gdisk, dosfstools, cryptsetup, grub-efi-amd64, grub-pc-bin",
-      "Installed Xorg, XFCE4, LightDM, Python3-PyQt6, Python3-GI GTK3, zram-tools, power-profiles-daemon, NetworkManager",
-      "Added Qt fallback stubs in desktop/shell/monodesk_shell.py to eliminate NameError without QML bindings",
-      "Fixed monodesk-profile.service systemd symlink in squashfs (removed regular-file override in rootfs_overlay)"
-    ],
-    "verification": {
-      "legacy_bios_seabios_boot": "PASSED (BOOT_MODE=LEGACY_BIOS, squashfs+overlayfs, lightdm/udisks2/monodesk-profile active)",
-      "calamares_uefi_disposable_install": "PASSED (25 GiB D:\\anti\\test-disposable-install.qcow2 GPT + 512 MiB EFI FAT32 + ext4 + GRUB EFI)",
-      "installed_system_direct_boot_no_iso": "PASSED (/dev/vda2 root ext4, /dev/vda1 /boot/efi vfat, user monodesk uid 1000, lightdm running)",
-      "profile_lite_4gb_auto_and_zram": "PASSED (4096 MB auto->lite, zram0 1.9G, powerprofilesctl power-saver)",
-      "profile_standard_8gb_auto_and_switch": "PASSED (8192 MB auto->standard, set standard/lite toggles zram0 977.2M<->1.9G & balanced<->power-saver)",
-      "remaining_rc1_limitations": [
-        "python3-pyqt6.qtquick not yet installed (PyQt6.QtQml missing; monodesk_shell.py exits gracefully while LightDM/XFCE4 runs)",
-        "Live root autologin getty drop-ins in /etc/systemd/system/{getty@tty1,serial-getty@ttyS0}.service.d persisted onto installed disk",
-        "Physical hardware (Lenovo IdeaPad Slim 5 & Lenovo B590) remains untested"
-      ]
+  "preserved_previous_releases": {
+    "v1_0_0": {
+      "version": "1.0.0",
+      "tag": "v1.0.0",
+      "source_commit": "af12f8bed5a590e63b3dfb7003934b51a43b4470",
+      "iso_filename": "monodesk-os-1.0.0-universal-amd64.iso",
+      "iso_bytes": 419575808,
+      "sha256": "9779da035e735351cbb4932fab4679ef98661d3d9dd0d8a10c5d25f6198e5371",
+      "github_url": "https://github.com/albykl123/monodesk-os/releases/tag/v1.0.0"
+    },
+    "v1_0_1_rc1": {
+      "version": "1.0.1-rc1",
+      "iso_filename": "monodesk-os-1.0.1-rc1-universal-amd64.iso",
+      "iso_bytes": 687063040,
+      "sha256": "eb5dbb19c4cf83efe30f5196bf563e8eaeb8d344e373e1f7cef98be4fe103b37"
     }
   },
   "profiles": [

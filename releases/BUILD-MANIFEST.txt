@@ -1,42 +1,32 @@
-MONODESK OS 1.0 — UNIVERSAL PC EDITION RELEASE MANIFEST
-==========================================================
-Product:             MONODESK OS 1.0 (Universal PC Edition)
-Published Version:   1.0.0 (preserved intact on GitHub Releases & Disk D)
-Candidate Version:   1.0.1-rc1 (post-validation defect-fix candidate, local)
+MONODESK OS 1.0.1 — UNIVERSAL PC EDITION RELEASE MANIFEST
+============================================================
+Product:             MONODESK OS 1.0.1 (Universal PC Edition)
+Release Tag:         v1.0.1
 Architecture:        amd64 (x86_64)
 Base Distribution:   Debian GNU/Linux 12 (Bookworm)
 Kernel:              Linux 6.1.0-54-amd64
-Source Tag / Commit: v1.0.0 (tag ae5c52b8c18b75b91ed51718b11dc1df5a79aaeb -> commit af12f8bed5a590e63b3dfb7003934b51a43b4470)
-Build Timestamp:     2026-11-12T09:02:50Z (v1.0.0)
-Build Environment:   Windows-11-10.0.26300-SP0 | Python 3.14.7 | PyCdlib 1.16.0 | QEMU x86_64 Debian 12 mksquashfs (xz -b 1M)
+Source Commit:       e0efd886af79b8f8c7db62f8adf1e14b177efb05
+Build Timestamp:     2026-11-12T13:51:50Z
+Build Environment:   Windows-11-10.0.26300-SP0 | Python 3.14.7 | PyCdlib 1.16.0 | QEMU x86_64 Debian 12 mksquashfs (zstd -Xcompression-level 9 -b 262144)
 
-Published Release v1.0.0 (Preserved Untouched)
-----------------------------------------------
-- ISO Filename:      monodesk-os-1.0.0-universal-amd64.iso
-- ISO Size:          419,575,808 bytes (400.14 MiB / 0.391 GiB)
-- ISO SHA-256:       9779da035e735351cbb4932fab4679ef98661d3d9dd0d8a10c5d25f6198e5371
-- GitHub URL:        https://github.com/albykl123/monodesk-os/releases/tag/v1.0.0
-- GitHub Assets:     monodesk-os-1.0.0-universal-amd64.iso, monodesk-os-1.0.0-universal-amd64.iso.sha256
-- Rootfs Squashfs:   live/filesystem.squashfs (237,420,544 bytes; sha256 6113dd67ddcb9dc7c5b14eb5c3717a13d3e4675db5ab712add98ab026d6c4fde)
-- Build Scripts:     D:\anti\prepare_live_initrd.py (822f152ef455), D:\anti\build_monodesk_universal_iso.py (55523b2ad763)
-- Output Copies:
-    - D:\monodesk-os-1.0.0-universal-amd64.iso
-    - D:\anti\monodesk-os\releases\monodesk-os-1.0.0-universal-amd64.iso
-    - D:\anti\src\monodesk-os-1.0.0-universal-amd64.iso
-    - D:\anti\monodesk-os\src\monodesk-os-1.0.0-universal-amd64.iso
+Production Release v1.0.1 (Current Verified Artifact)
+-----------------------------------------------------
+- ISO Filename:      monodesk-os-1.0.1-universal-amd64.iso
+- ISO Location:      D:\anti\monodesk-os\releases\monodesk-os-1.0.1-universal-amd64.iso
+- ISO Size:          766,408,704 bytes (730.90 MiB / 0.714 GiB)
+- ISO SHA-256:       3b8ad75a7f3d011d591d30b42efbb48d7edb53a316a642d7ea8465105c219776
+- Rootfs Squashfs:   live/filesystem.squashfs (583,917,568 bytes / 556.86 MiB; sha256 a418a38466180c864b77243f236447255a474a76b51eae89d4c6ee226f84c949)
+- Packages:          761 Debian Bookworm packages + MONODESK custom applications/shell
+- GitHub URL:        https://github.com/albykl123/monodesk-os/releases/tag/v1.0.1
+- Shell / Desktop:   PyQt6.QtQml + QtQuick 6.4.2 verified in running Xorg :0 + XFCE fallback verified
+- Installer & Sec:   Calamares 3.2.61-1+b1 GPT/UEFI + shellprocess@cleanup (no live root autologin or live creds on target)
+- Installed Boots:   8192 MB Standard & 4096 MB Lite verified directly from virtual NVMe/virtio disk (no ISO)
 
-Release Candidate v1.0.1-rc1 (Post-Validation Fixes)
-----------------------------------------------------
-- ISO Filename:      monodesk-os-1.0.1-rc1-universal-amd64.iso
-- ISO Location:      D:\anti\monodesk-os\releases\monodesk-os-1.0.1-rc1-universal-amd64.iso
-- ISO Size:          687,063,040 bytes (655.23 MiB / 0.640 GiB)
-- ISO SHA-256:       eb5dbb19c4cf83efe30f5196bf563e8eaeb8d344e373e1f7cef98be4fe103b37
-- Rootfs Squashfs:   live/filesystem.squashfs (504,745,984 bytes; 481.36 MiB)
-- Legacy BIOS Boot:  cdboot_eltorito.img (159,675 bytes; GRUB i386-pc core.img + boot_info_table=True) -> PASSED
-- Installer E2E:     Calamares 3.2.61-1+b1 on 25 GiB qcow2 + UEFI boot directly from /dev/vda2 ext4 -> PASSED
-- Desktop / Service: LightDM + Xorg + XFCE4 + udisks2 + zramswap + power-profiles-daemon + monodesk-profile.service -> PASSED
-- Known RC1 Gaps:    python3-pyqt6.qtquick absent (graceful fallback), root getty autologin persisted to target, physical Lenovo hardware untested
+Preserved Historical Releases
+-----------------------------
+- v1.0.0 (GitHub):   monodesk-os-1.0.0-universal-amd64.iso | 419,575,808 bytes | sha256 9779da035e735351cbb4932fab4679ef98661d3d9dd0d8a10c5d25f6198e5371
+- v1.0.1-rc1 (Local): monodesk-os-1.0.1-rc1-universal-amd64.iso | 687,063,040 bytes | sha256 eb5dbb19c4cf83efe30f5196bf563e8eaeb8d344e373e1f7cef98be4fe103b37
 
-Unit Test Suite
----------------
-- pytest -v (D:\anti\monodesk-os\tests): 32 passed in 1.65s
+Unit & Host Test Suite
+----------------------
+- pytest -v (D:\anti\monodesk-os\tests): 35 passed in 2.90s
