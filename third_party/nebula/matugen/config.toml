@@ -1,0 +1,26 @@
+[config]
+
+[config.custom_colors]
+red     = "#e06c75"
+green   = "#98c379"
+yellow  = "#e5c07b"
+blue    = "#61afef"
+magenta = "#c678dd"
+cyan    = "#56b6c2"
+
+[templates.ghostty]
+input_path  = "~/.config/matugen/templates/ghostty-colors"
+output_path = "~/.config/ghostty/themes/matugen"
+post_hook   = "pkill -USR2 -x ghostty || true"
+
+[templates.pywal-plain]
+input_path  = "~/.config/matugen/templates/pywal-colors"
+output_path = "~/.cache/wal/colors"
+
+[templates.pywal]
+input_path  = "~/.config/matugen/templates/pywal-colors.json"
+output_path = "~/.cache/wal/colors.json"
+
+[templates.quickshell]
+input_path  = "~/.config/matugen/templates/quickshell-colors.json"
+output_path = "~/.local/state/nebula/colors.json"
