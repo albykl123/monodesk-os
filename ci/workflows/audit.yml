@@ -1,0 +1,66 @@
+name: MONODESK OS 2.0 — Quality & Security Audit
+
+on:
+  push:
+    branches:
+      - master
+      - v2.0-nebula
+  pull_request:
+    branches:
+      - master
+      - v2.0-nebula
+
+jobs:
+  lint-and-unit-tests:
+    name: Code Quality & Unit Test Suite
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Test Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest flake8
+
+      - name: Syntax & Compilation Validation
+        run: |
+          python -m compileall applications desktop services system tests
+
+      - name: Run Pytest Test Suite
+        run: |
+          pytest tests/ -v --tb=short
+
+  license-and-structure-audit:
+    name: Third-Party Licenses & Integrity Audit
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Upstream Nebula Snapshot
+        run: |
+          test -f third_party/nebula/LICENSE
+          grep -q "AFFERO GENERAL PUBLIC LICENSE" third_party/nebula/LICENSE
+          test -f docs/NEBULA_UPSTREAM_AUDIT.md
+          test -f docs/NEBULA_DEBIAN_PORT.md
+          test -f docs/THIRD_PARTY_LICENSES.md
+          echo "[✓] Upstream Nebula licenses and documentation verified."
+
+      - name: Verify M3Shapes Snapshot
+        run: |
+          test -f third_party/m3shapes/LICENSE
+          grep -q "Apache License" third_party/m3shapes/LICENSE
+          echo "[✓] M3Shapes Apache-2.0 license verified."
+
+      - name: Verify Package Manifests
+        run: |
+          for manifest in build/live-build/config/package-lists/*.list.chroot; do
+            test -s "$manifest"
+            echo "[✓] Checked manifest: $manifest"
+          done

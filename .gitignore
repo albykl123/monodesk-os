@@ -24,3 +24,7 @@ build/logs/*.log
 # Local builder keys
 builder_key
 builder_key.pub
+
+# Local diagnostic scripts
+scripts/*reverselab*
+

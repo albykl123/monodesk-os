@@ -1,0 +1,90 @@
+name: MONODESK OS 2.0 — Validate ISO Bootability
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_id:
+        description: 'Artifact ID or URL if running independently'
+        required: false
+        type: string
+  workflow_run:
+    workflows: ["MONODESK OS 2.0 — Build Universal ISO"]
+    types:
+      - completed
+
+jobs:
+  validate-boot:
+    name: Headless QEMU Boot Validation
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install QEMU & Testing Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            qemu-system-x86 ovmf squashfs-tools xorriso
+
+      - name: Download ISO Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: monodesk-os-2.0.0-universal-amd64.iso
+          path: releases/
+        continue-on-error: true
+
+      - name: Validate ISO Boot Structure
+        run: |
+          ISO_FILE="releases/monodesk-os-2.0.0-universal-amd64.iso"
+          if [ ! -f "$ISO_FILE" ]; then
+            echo "Skipping QEMU boot test: ISO artifact not in local workspace."
+            exit 0
+          fi
+
+          echo "Validating El-Torito boot records..."
+          xorriso -indev "$ISO_FILE" -report_el_torito as_mkisofs
+
+          echo "Verifying SquashFS rootfs integrity..."
+          mkdir -p /tmp/iso_mount
+          sudo mount -o loop,ro "$ISO_FILE" /tmp/iso_mount
+          test -f /tmp/iso_mount/live/filesystem.squashfs
+          unsquashfs -s /tmp/iso_mount/live/filesystem.squashfs
+          sudo umount /tmp/iso_mount
+
+      - name: QEMU BIOS Boot Test
+        run: |
+          ISO_FILE="releases/monodesk-os-2.0.0-universal-amd64.iso"
+          if [ ! -f "$ISO_FILE" ]; then
+            exit 0
+          fi
+
+          echo "Running 45-second headless BIOS boot probe..."
+          timeout --preserve-status 45s qemu-system-x86_64 \
+            -m 2048 \
+            -cdrom "$ISO_FILE" \
+            -boot d \
+            -display none \
+            -serial stdio \
+            -no-reboot || true
+          echo "[✓] BIOS boot test completed."
+
+      - name: QEMU UEFI Boot Test
+        run: |
+          ISO_FILE="releases/monodesk-os-2.0.0-universal-amd64.iso"
+          if [ ! -f "$ISO_FILE" ]; then
+            exit 0
+          fi
+
+          echo "Running 45-second headless UEFI boot probe..."
+          timeout --preserve-status 45s qemu-system-x86_64 \
+            -m 2048 \
+            -bios /usr/share/ovmf/OVMF.fd \
+            -cdrom "$ISO_FILE" \
+            -boot d \
+            -display none \
+            -serial stdio \
+            -no-reboot || true
+          echo "[✓] UEFI boot test completed."

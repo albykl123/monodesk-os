@@ -1,10 +1,12 @@
-# MONODESK OS 1.0 (Universal PC Edition)
+# MONODESK OS 2.0 (Universal PC Edition)
 ## Universal Hardware Compatibility & Validation Matrix
 
-**Release Target:** MONODESK OS 1.0 Universal PC Edition  
-**Architecture:** AMD64 / x86-64 (Universal x86-64-v1 Baseline with Dynamic Extensions)  
-**Kernel:** Linux 6.1 LTS with Debian Universal Firmware Stack  
-**Single Universal Image:** `monodesk-os-1.0.0-universal-amd64.iso`
+**Release Target:** MONODESK OS 2.0.0 Universal PC Edition  
+**Architecture:** AMD64 / x86-64 (Universal Baseline with Dynamic GPU Routing)  
+**Base Distribution:** Debian 13 (Trixie) AMD64  
+**Kernel:** Linux LTS (Debian 13 Kernel) with Universal Firmware Stack  
+**Single Universal Image:** `monodesk-os-2.0.0-universal-amd64.iso`  
+**Desktop Engines:** MONODESK Wayland (Hyprland + Quickshell) & MONODESK Recovery (X11 + XFWM4)
 
 ---
 

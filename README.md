@@ -1,126 +1,106 @@
-# MONODESK OS 1.0 — Universal PC Edition
-> **A complete, independent, publicly distributable PC operating system and modern Windows alternative with an original Nothing-inspired monochrome design language.**
+# MONODESK OS 2.0 — Universal PC Edition
+> **A complete, independent, publicly distributable PC operating system and modern Windows alternative featuring a fluid Wayland desktop shell, Nothing-inspired monochrome design language, and enterprise Debian 13 base.**
 
-[![Base](https://img.shields.io/badge/Base-Debian%2012%20(Bookworm)-D70A53.svg)](https://www.debian.org)
+[![Base](https://img.shields.io/badge/Base-Debian%2013%20(Trixie)-D70A53.svg)](https://www.debian.org)
 [![Architecture](https://img.shields.io/badge/Architecture-x86--64%20%2F%20AMD64-blue.svg)](https://en.wikipedia.org/wiki/X86-64)
-[![Desktop](https://img.shields.io/badge/Desktop%20Shell-MONODESK%20Shell%20(Qt%206%20%2F%20QML)-black.svg)](desktop/shell/)
-[![License](https://img.shields.io/badge/License-GPLv3%20%2F%20MIT-green.svg)](LICENSE)
+[![Desktop](https://img.shields.io/badge/Desktop%20Shell-Hyprland%20%2B%20Quickshell%20(Wayland)-black.svg)](shell/)
+[![License](https://img.shields.io/badge/License-GPLv3%20%2F%20AGPLv3-green.svg)](LICENSE)
 [![Zero Telemetry](https://img.shields.io/badge/Privacy-100%25%20Zero%20Telemetry-blueviolet.svg)](docs/PRIVACY.md)
 
 ---
 
-## 1. Vision: A Genuine Windows Alternative
+## 1. Vision & Architecture Overview
 
-MONODESK OS is engineered as an everyday personal computer operating system that people can install on their laptop or desktop, switch on every morning, and use for work, education, programming, gaming, multimedia entertainment, file management, and system administration.
+MONODESK OS 2.0.0 is an independent, production-grade Linux operating system designed for daily personal computing. It provides a full, seamless alternative to Windows 10/11 with zero proprietary tracking, zero forced cloud telemetry, and complete user privacy.
 
-It bridges three core pillars:
-1. **The Monochrome Computing Experience:** Minimalist high-contrast monochrome design, distinctive dot-matrix visual language, functional widgets, and subtle red accents (`#E63946`).
-2. **Windows-Class Completeness:** A complete first-party ecosystem matching every major Windows capability without proprietary bloat or forced cloud accounts.
-3. **Enterprise Linux Stability:** Built upon a pinned Debian 12 (Bookworm) stable foundation, the Linux LTS kernel, PipeWire audio, NetworkManager, and universal x86-64 hardware enablement.
+### The Dual-Engine Desktop Architecture
+
+MONODESK OS 2.0 introduces an intelligent dual-engine architecture to guarantee universal PC compatibility across both cutting-edge hardware and decade-old systems:
+
+1. **Primary Session — MONODESK Wayland:**
+   - **Compositor:** Hyprland 0.42+ dynamic tiling Wayland compositor with hardware-accelerated animations and GLSL shaders.
+   - **Shell Framework:** Quickshell (Qt 6 / QML) powered by the **Nebula** foundation.
+   - **Shapes & Effects:** Dynamic Material 3 shapes via `m3shapes`, fluid blur, and dark dot-matrix aesthetics.
+   - **Target Hardware:** Intel Iris/Xe/UHD, AMD Radeon (amdgpu/radeonsi), NVIDIA (proprietary/nouveau with KMS/DRM), and modern virtual machines.
+
+2. **Recovery / Legacy Session — MONODESK Recovery (X11):**
+   - **Compositor / Window Manager:** X11 + XFWM4.
+   - **Shell Engine:** MONODESK Qt 6 Shell.
+   - **Target Hardware:** Legacy Intel HD 3000 (Sandy Bridge), non-DRM graphics chips, safe-graphics mode, and low-RAM legacy systems.
+
+The `/usr/bin/monodesk-session` router automatically benchmarks GPU capabilities via `monodesk-hw-detect --check-compositor` at login to deploy the optimal desktop engine.
 
 ---
 
-## 2. Windows Capabilities vs. MONODESK OS
+## 2. Desktop Feature Matrix
 
-| Windows 10/11 Capability | MONODESK OS Equivalent | Technical Implementation |
+| Area | Feature | Implementation |
 | :--- | :--- | :--- |
-| **Windows Desktop & DWM** | **MONODESK Desktop Shell** | Custom Qt 6 / QML modular desktop surface + XFWM4 window management |
-| **Start Menu** | **MONODESK Launcher** | Fullscreen / popup categorized launcher with instant keyboard search (`Super`) |
-| **Taskbar** | **MONODESK Dock** | Bottom centered dock with pinned & running indicators, context menus |
-| **File Explorer** | **MONODESK Files** | First-party integrated file manager with archive, network & drive support |
-| **Windows Settings** | **MONODESK Settings** | Centralized configuration hub for displays, sound, network, themes, power |
-| **Microsoft Store** | **MONODESK Software Store** | Curated software store for verified Debian packages & Flatpak apps |
-| **Windows Update** | **MONODESK Updater** | Signed APT updater with essential package protection and reboot detection |
-| **Task Manager** | **MONODESK System Monitor** | Real-time per-core CPU, RAM, zRAM, and per-process kill/priority control |
-| **Device Manager** | **MONODESK Device Manager** | Tree-based PCI/USB controller discovery and kernel module inspection |
-| **Disk Management** | **MONODESK Disk Manager** | Storage discovery, partition inspection, mounting, and SMART health checks |
-| **Control Panel** | **MONODESK Control Centre** | Quick settings for Wi-Fi, Bluetooth, Audio, Brightness, Power profiles |
-| **User Accounts** | **MONODESK Account Manager** | Local users, password management, administrator privileges (`sudo`), sessions |
-| **Windows Search (Spotlight)** | **MONODESK Quick Search** | Instant universal spotlight search (`Alt + Space`) across apps and settings |
-| **Windows Defender** | **MONODESK Security Centre** | UFW network firewall, AppArmor sandboxing, signed GPG package verification |
-| **Windows Recovery** | **MONODESK Recovery Centre** | Package database repair (`dpkg --configure -a`), EFI boot diagnostics, chroot |
-| **Backup and Restore** | **MONODESK Backup Manager** | Scheduled rsync snapshots, integrity hashing, restore preview with confirmation |
-| **Virtual Desktops** | **MONODESK Smart Workspace** | Multi-desktop management, window snapping and tiling (`Super + Arrows`) |
-| **Power & Battery** | **MONODESK Performance Manager** | Dual profiles (**Lite** for 4GB RAM vs. **Standard** for 8GB+ RAM) via `monodesk-profile-ctl` |
-| **Windows Compatibility** | **MONODESK Compatibility Centre**| Wine & Proton runtime manager, prefix manager, compatibility database |
-| **Gaming Platform** | **MONODESK Gaming Centre** | Steam, Proton, Lutris, Heroic, controller detection, Vulkan 3D diagnostics |
-| **Developer Tools** | **MONODESK Developer Centre** | One-click toolchains for Git, Python, C/C++, Rust, Node.js, and containers |
-| **Local AI (Copilot Alt.)** | **MONODESK Local AI** | 100% on-device private assistant (disabled by default, 0 cloud dependency) |
+| **Shell** | Floating Island Bar & Dock | Quickshell reactive QML desktop shell with pinned/running app state |
+| **Launcher** | Dynamic Application Search | Fuzzy-filtered search indexing all standard `.desktop` applications |
+| **Quick Settings** | System Control Center | Real-time toggles for Wi-Fi (`nmcli`), Bluetooth (`bluetoothctl`), Audio (`PipeWire`), and Power |
+| **Hardware** | Adaptive Profile Engine | Dual profile tiers: **Standard** (8GB+ RAM, full effects) and **Lite** (2-4GB RAM, zram, reduced animations) |
+| **Settings** | 21-Page System Settings | Dedicated control panel for display, resolution, brightness, sound, users, privacy, and updates |
+| **Software** | Software Centre | Native APT package management and sandboxed Flatpak application catalog |
+| **Installer** | Calamares Live Installer | Graphical installer with automated partitioning, LUKS encryption, Btrfs, and UEFI/BIOS support |
 
 ---
 
-## 3. Four-Layer Operating System Architecture
+## 3. Third-Party Attribution & Non-Affiliation
 
-```
-Layer 1 — MONODESK Experience
-  MONODESK Shell (Qt 6 / QML) • Dock • Launcher • Quick Search • Widgets • Notifications • Adaptive Themes
+### Non-Affiliation Disclaimer
+MONODESK OS is an independent open-source Linux operating system project. MONODESK OS is not affiliated with, sponsored by, or endorsed by Nothing Technology Limited. All artwork, glyphs, dot-matrix icons, and themes are original open-source creations.
 
-Layer 2 — MONODESK Applications
-  Welcome • Settings • Files • Store • Updater • Hardware Centre • Device Manager • Disk Manager •
-  Network Centre • Bluetooth Centre • Print Centre • System Monitor • Privacy • Backup • Recovery •
-  Accessibility • Clipboard • Workspace • Compatibility Centre • Gaming Centre • Developer Centre • Local AI
+### Upstream Open-Source Attributions
+- **Nebula Desktop Environment:** Created by [LilaccFlowerr](https://github.com/LilaccFlowerr/Nebula), licensed under GNU AGPL-3.0. Upstream source preserved in `third_party/nebula/`.
+- **Material 3 Shapes (M3Shapes):** Created by [soramanew](https://github.com/soramanew/m3shapes), licensed under Apache-2.0. Source preserved in `third_party/m3shapes/`.
+- **Hyprland:** Created by Vaxry and the Hyprland development team (BSD 3-Clause).
+- **Quickshell:** Created by the Quickshell team (LGPL v3 / GPL v3).
+- **Debian GNU/Linux:** Created by Software in the Public Interest, Inc. (DFSG).
+- **Calamares:** Graphical installer framework (GPL v3).
 
-Layer 3 — MONODESK System Platform
-  D-Bus Session Services (org.monodesk.Shell) • PolicyKit Privileged Helpers • monodesk-profile-ctl •
-  Diagnostics & Privacy Redaction Engine • Power Management Daemons
-
-Layer 4 — Linux Foundation
-  Debian 12 (Bookworm) Pinned Stable • Linux 6.1 LTS Kernel with Universal Microcode (Intel & AMD) •
-  XFWM4 Window Manager • PipeWire Audio • NetworkManager • Mesa 3D • UFW & AppArmor Security • Calamares
-```
+See [`docs/THIRD_PARTY_LICENSES.md`](docs/THIRD_PARTY_LICENSES.md) for full license texts and copyright statements.
 
 ---
 
-## 4. Hardware Support & Benchmarks
+## 4. Building the ISO
 
-MONODESK OS maintains a **Universal x86-64 baseline**:
-- **Processors:** Intel Core (Nehalem through modern Raptor Lake/Meteor Lake), Celeron, Pentium (64-bit); AMD Ryzen 1000 through 7000 series, Athlon 64-bit, EPYC.
-- **Reference Targets:**
-  - **Lenovo B590 (Low-End Benchmark):** Intel Core i3-2348M, 4 GB RAM, Intel HD 3000. Operates on **MONODESK Lite** (~700–900 MB idle RAM with zRAM).
-  - **Lenovo IdeaPad Slim 5 (Modern Reference):** AMD Ryzen 7 5700U, 16 GB RAM, NVMe SSD. Operates on **MONODESK Standard** (full compositing & widgets).
-- **Graphics Acceleration:** Out-of-the-box Mesa DRM/KMS drivers for Intel and AMD GPUs; open-source Nouveau for NVIDIA cards, with an automated proprietary driver assistant (`monodesk-nvidia-installer`).
+### Automated Build via GitHub Actions (Recommended)
+1. Fork or push to your GitHub repository.
+2. Navigate to **Actions** → **MONODESK OS 2.0 — Build Universal ISO**.
+3. Select **Run workflow**. The workflow automatically:
+   - Reclaims runner storage to guarantee > 25 GB free space.
+   - Compiles `m3shapes` for Qt 6.
+   - Executes Debian 13 `live-build`.
+   - Generates and uploads `monodesk-os-2.0.0-universal-amd64.iso` and SHA-256 checksums.
 
----
-
-## 5. Building and Testing the Hybrid ISO
-
-Run inside a Debian 12 (Bookworm) build environment with root privileges:
+### Local Build in Linux Builder VM
 ```bash
-# 1. Install build prerequisites
-sudo bash scripts/install-build-deps.sh
+# 1. Install prerequisites
+sudo apt-get update && sudo apt-get install -y live-build debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin cmake ninja-build qt6-base-dev qt6-declarative-dev
 
-# 2. Execute automated live-build pipeline
-sudo bash scripts/build-iso.sh
+# 2. Compile M3Shapes
+cmake -S third_party/m3shapes -B build/m3shapes -G Ninja -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build/m3shapes
+sudo cmake --install build/m3shapes
 
-# 3. Verify SHA-256 and El Torito boot sectors
-bash scripts/verify-iso.sh releases/monodesk-os-1.0.0-universal-amd64.iso
-
-# 4. Test boot and live installation in disposable QEMU virtual machine
-bash scripts/test-iso.sh releases/monodesk-os-1.0.0-universal-amd64.iso 4096 uefi
+# 3. Configure and build ISO
+cd build/live-build
+sudo lb clean --all
+sudo lb config
+sudo lb build
 ```
 
 ---
 
-## 6. Comprehensive Documentation Index
+## 5. Verification & Testing
 
-- [Final Architecture Specification](docs/FINAL-ARCHITECTURE.md)
-- [Architecture Decision Log](docs/DECISION-LOG.md)
-- [Project Audit & Baseline](docs/PROJECT-AUDIT.md)
-- [Master Implementation Plan](docs/IMPLEMENTATION-PLAN.md)
-- [Requirement Traceability Matrix](docs/REQUIREMENT-TRACEABILITY.md)
-- [Build Status & Engineering Log](docs/BUILD-STATUS.md)
-- [Test Status & Evidence](docs/TEST-STATUS.md)
-- [Known Limitations & Scope Boundaries](docs/KNOWN-LIMITATIONS.md)
-- [Hardware Compatibility Matrix](docs/HARDWARE-COMPATIBILITY.md)
-- [Windows Application Compatibility Database](docs/WINDOWS-APP-COMPATIBILITY.md)
-- [Gaming & Multimedia Compatibility Matrix](docs/GAMING-COMPATIBILITY.md)
-- [Official User & Administrator Guide](docs/USER-GUIDE.md)
-- [Comprehensive Installation Guide](docs/INSTALLATION-GUIDE.md)
-- [Security Specification & Policy](docs/SECURITY.md)
-- [Privacy Policy & Zero-Telemetry Commitment](docs/PRIVACY.md)
-- [Public Release & Maintenance Process](docs/RELEASE-PROCESS.md)
-- [Official Release Notes](docs/RELEASE-NOTES.md)
-- [Third-Party Software Licenses & Attributions](docs/THIRD-PARTY-LICENSES.md)
+Run unit tests locally:
+```bash
+pytest tests/ -v
+```
 
----
-*Authored autonomously by Antigravity Operating System Engineering Team.*
+Validate ISO boot in QEMU:
+```bash
+qemu-system-x86_64 -m 4096 -cdrom releases/monodesk-os-2.0.0-universal-amd64.iso -boot d
+```

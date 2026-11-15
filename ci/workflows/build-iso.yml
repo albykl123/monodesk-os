@@ -1,0 +1,197 @@
+name: MONODESK OS 2.0 — Build Universal ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Default target profile (standard or lite)'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+          - standard
+          - lite
+  push:
+    branches:
+      - v2.0-nebula
+    paths:
+      - 'build/**'
+      - 'compositor/**'
+      - 'shell/**'
+      - 'applications/**'
+      - 'scripts/**'
+      - 'system/**'
+      - '.github/workflows/build-iso.yml'
+
+jobs:
+  build-universal-iso:
+    name: Build Debian 13 Universal AMD64 ISO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reclaim Runner Disk Space
+        run: |
+          echo "=== Disk space before cleanup ==="
+          df -h /
+          echo "Reclaiming runner disk space..."
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo docker image prune -a --force || true
+          sudo apt-get clean
+          echo "=== Disk space after cleanup ==="
+          df -h /
+          FREE_GB=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+          if [ "$FREE_GB" -lt 22 ]; then
+            echo "ERROR: Insufficient disk space ($FREE_GB GB available, minimum 22 GB required)"
+            exit 1
+          fi
+
+      - name: Install Host Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            live-build debootstrap squashfs-tools xorriso \
+            grub-pc-bin grub-efi-amd64-bin mtools dosfstools e2fsprogs \
+            cmake ninja-build g++ qt6-base-dev qt6-declarative-dev \
+            isolinux syslinux-common python3-pip jq curl
+
+      - name: Compile M3Shapes QML Plugin
+        run: |
+          echo "Building M3Shapes QML Plugin for Qt 6..."
+          mkdir -p build/m3shapes
+          cmake -S third_party/m3shapes -B build/m3shapes -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu
+          cmake --build build/m3shapes
+          DESTDIR="$PWD/staging/m3shapes" cmake --install build/m3shapes
+          
+          # Stage into live-build chroot overlay
+          TARGET_QML="build/live-build/config/includes.chroot/usr/lib/x86_64-linux-gnu/qt6/qml/m3shapes"
+          mkdir -p "$TARGET_QML"
+          cp -r staging/m3shapes/usr/lib/x86_64-linux-gnu/qt6/qml/m3shapes/* "$TARGET_QML/" || true
+          echo "[✓] Staged M3Shapes QML plugin."
+
+      - name: Stage MONODESK Shell, Applications and Overlays
+        run: |
+          CHROOT="build/live-build/config/includes.chroot"
+          mkdir -p "$CHROOT/usr/share/monodesk"
+          mkdir -p "$CHROOT/usr/bin"
+          mkdir -p "$CHROOT/usr/share/wayland-sessions"
+          mkdir -p "$CHROOT/usr/share/xsessions"
+          mkdir -p "$CHROOT/etc/skel/.config/hypr"
+          mkdir -p "$CHROOT/etc/skel/.config/quickshell"
+          mkdir -p "$CHROOT/etc/skel/.config/matugen"
+
+          # Stage sessions
+          install -m 755 compositor/sessions/monodesk-session "$CHROOT/usr/bin/monodesk-session"
+          install -m 644 compositor/sessions/monodesk-wayland.desktop "$CHROOT/usr/share/wayland-sessions/"
+          install -m 644 compositor/sessions/monodesk-recovery.desktop "$CHROOT/usr/share/xsessions/"
+
+          # Stage hyprland config
+          cp -r compositor/hyprland/* "$CHROOT/etc/skel/.config/hypr/"
+
+          # Stage shell & quickshell
+          cp -r shell/quickshell/* "$CHROOT/etc/skel/.config/quickshell/"
+          cp -r shell/monodesk-branding "$CHROOT/usr/share/monodesk/"
+          cp -r shell/monodesk-components "$CHROOT/usr/share/monodesk/"
+
+          # Stage system scripts and applications
+          install -m 755 system/hardware/monodesk-hw-detect "$CHROOT/usr/bin/monodesk-hw-detect"
+          install -m 755 system/power/monodesk-profile-ctl "$CHROOT/usr/bin/monodesk-profile-ctl"
+          cp -r applications "$CHROOT/usr/share/monodesk/"
+          cp -r desktop "$CHROOT/usr/share/monodesk/"
+
+          # Set permissions
+          chmod +x "$CHROOT/usr/bin/"* || true
+          echo "[✓] All overlays and configurations staged."
+
+      - name: Execute Live-Build
+        run: |
+          cd build/live-build
+          echo "Configuring Debian 13 Live-Build..."
+          sudo lb clean --all
+          sudo lb config
+          echo "Executing lb build (this takes ~20-30 minutes)..."
+          sudo lb build 2>&1 | tee build.log
+
+      - name: Verify and Package ISO
+        run: |
+          mkdir -p releases
+          ISO_SRC=$(find build/live-build -maxdepth 1 -name "*.iso" | head -n 1)
+          if [ -z "$ISO_SRC" ] || [ ! -f "$ISO_SRC" ]; then
+            echo "ERROR: No ISO image generated by live-build!"
+            exit 1
+          fi
+
+          TARGET_ISO="releases/monodesk-os-2.0.0-universal-amd64.iso"
+          sudo mv "$ISO_SRC" "$TARGET_ISO"
+          sudo chown $(id -u):$(id -g) "$TARGET_ISO"
+
+          # Compute SHA256
+          cd releases
+          sha256sum monodesk-os-2.0.0-universal-amd64.iso > monodesk-os-2.0.0-universal-amd64.iso.sha256
+          cat monodesk-os-2.0.0-universal-amd64.iso.sha256
+          cd ..
+
+          # Check size
+          SIZE_BYTES=$(stat -c%s "$TARGET_ISO")
+          SIZE_MB=$((SIZE_BYTES / 1024 / 1024))
+          echo "ISO Size: $SIZE_MB MB ($SIZE_BYTES bytes)"
+          if [ "$SIZE_MB" -lt 1500 ]; then
+            echo "ERROR: ISO size ($SIZE_MB MB) is suspiciously small!"
+            exit 1
+          fi
+
+          # Verify boot structure
+          echo "Verifying ISO boot structure with xorriso..."
+          xorriso -indev "$TARGET_ISO" -report_el_torito as_mkisofs
+
+      - name: Generate Build Manifests
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          SHA256=$(awk '{print $1}' releases/monodesk-os-2.0.0-universal-amd64.iso.sha256)
+          SIZE=$(stat -c%s "releases/monodesk-os-2.0.0-universal-amd64.iso")
+          
+          cat <<EOF > releases/BUILD-MANIFEST-2.0.0.json
+          {
+            "product": "MONODESK OS",
+            "version": "2.0.0",
+            "edition": "Universal PC Edition",
+            "base": "Debian 13 (Trixie)",
+            "architecture": "amd64",
+            "iso_filename": "monodesk-os-2.0.0-universal-amd64.iso",
+            "iso_size_bytes": $SIZE,
+            "sha256": "$SHA256",
+            "build_timestamp": "$TIMESTAMP",
+            "git_commit": "$GITHUB_SHA",
+            "git_branch": "$GITHUB_REF_NAME",
+            "builder": "GitHub Actions (${{ runner.os }})"
+          }
+          EOF
+          cat releases/BUILD-MANIFEST-2.0.0.json
+
+      - name: Upload ISO Checksums and Manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: monodesk-os-2.0.0-manifests
+          path: |
+            releases/monodesk-os-2.0.0-universal-amd64.iso.sha256
+            releases/BUILD-MANIFEST-2.0.0.json
+            build/live-build/build.log
+
+      - name: Upload ISO Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: monodesk-os-2.0.0-universal-amd64.iso
+          path: releases/monodesk-os-2.0.0-universal-amd64.iso
+          retention-days: 14
