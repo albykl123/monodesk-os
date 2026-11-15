@@ -44,10 +44,10 @@ class TestMonodeskShellAndSecurity(unittest.TestCase):
 
     def test_package_lists_and_calamares_cleanup(self):
         core_list = (REPO_ROOT / "build/live-build/config/package-lists/01-core.list.chroot").read_text(encoding="utf-8")
-        desktop_list = (REPO_ROOT / "build/live-build/config/package-lists/02-desktop.list.chroot").read_text(encoding="utf-8")
+        qt_list = (REPO_ROOT / "build/live-build/config/package-lists/07-qt-dependencies.list.chroot").read_text(encoding="utf-8")
         self.assertIn("user-setup", core_list)
-        self.assertIn("python3-pyqt6.qtquick", desktop_list)
-        self.assertIn("python3-pyqt6.qtqml", desktop_list)
+        self.assertIn("python3-pyqt6.qtquick", qt_list)
+        self.assertIn("python3-pyqt6.qtqml", qt_list)
 
         settings = (REPO_ROOT / "build/live-build/config/includes.chroot/etc/calamares/settings.conf").read_text(encoding="utf-8")
         cleanup = (REPO_ROOT / "build/live-build/config/includes.chroot/etc/calamares/modules/shellprocess-cleanup.conf").read_text(encoding="utf-8")

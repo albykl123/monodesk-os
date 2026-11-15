@@ -1,0 +1,3 @@
+module MonodeskComponents
+CalamaresLauncher 1.0 CalamaresLauncher.qml
+MonodeskProfileBridge 1.0 MonodeskProfileBridge.qml
