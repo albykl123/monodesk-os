@@ -614,6 +614,24 @@ def save_logs(hw: Dict[str, Any], report_text: str):
     except Exception:
         pass
 
+def check_compositor(hw: Dict[str, Any]) -> str:
+    """
+    Determine whether system should run Wayland (Hyprland + Quickshell)
+    or fallback to Recovery X11 session.
+    """
+    gpu = hw.get("gpu", {})
+    ram = hw.get("ram", {})
+    total_ram = ram.get("total_mb", 4096)
+    accel = gpu.get("acceleration", "unknown")
+    driver = gpu.get("active_driver", "")
+
+    # Wayland requires hardware KMS/DRM acceleration and at least 2 GB RAM
+    if accel == "hardware" and total_ram >= 2048:
+        return "wayland"
+    
+    # Software rasterizer or low RAM falls back to X11 recovery session
+    return "x11"
+
 def main():
     parser = argparse.ArgumentParser(description="MONODESK OS Universal Hardware Detection & Profile Engine")
     parser.add_argument("--recommend", action="store_true", help="Print recommended profile (standard or lite)")
@@ -621,6 +639,7 @@ def main():
     parser.add_argument("--json", action="store_true", help="Print full hardware data as JSON")
     parser.add_argument("--report", action="store_true", help="Print full human-readable hardware report")
     parser.add_argument("--summary", action="store_true", help="Print single-line summary")
+    parser.add_argument("--check-compositor", action="store_true", help="Print recommended session: wayland or x11")
     args = parser.parse_args()
 
     hw = detect_all()
@@ -628,7 +647,9 @@ def main():
     report_text = generate_report(hw)
     save_logs(hw, report_text)
 
-    if args.recommend:
+    if args.check_compositor:
+        print(check_compositor(hw))
+    elif args.recommend:
         print(rec_profile)
     elif args.reasons:
         for r in reasons:

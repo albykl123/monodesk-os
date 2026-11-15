@@ -37,6 +37,10 @@ def apply_lite_profile():
 
     # 1. Disable compositor shadows, animations, and opacity
     run_cmd(["xfconf-query", "-c", "xfwm4", "-p", "/general/use_compositing", "-s", "false"])
+    if os.environ.get("WAYLAND_DISPLAY"):
+        run_cmd(["hyprctl", "keyword", "animations:enabled", "false"])
+        run_cmd(["hyprctl", "keyword", "decoration:blur:enabled", "false"])
+        run_cmd(["hyprctl", "keyword", "decoration:drop_shadow", "false"])
 
     # 2. Configure aggressive zram memory compression (zstd, 50% of RAM)
     zram_conf = "/etc/default/zramswap"
@@ -67,6 +71,10 @@ def apply_standard_profile():
     # 1. Enable full compositor with subtle window shadows
     run_cmd(["xfconf-query", "-c", "xfwm4", "-p", "/general/use_compositing", "-s", "true"])
     run_cmd(["xfconf-query", "-c", "xfwm4", "-p", "/general/show_frame_shadow", "-s", "true"])
+    if os.environ.get("WAYLAND_DISPLAY"):
+        run_cmd(["hyprctl", "keyword", "animations:enabled", "true"])
+        run_cmd(["hyprctl", "keyword", "decoration:blur:enabled", "true"])
+        run_cmd(["hyprctl", "keyword", "decoration:drop_shadow", "true"])
 
     # 2. Moderate zram (25% of RAM)
     zram_conf = "/etc/default/zramswap"
