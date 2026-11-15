@@ -1,0 +1,15 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Hyprland Compositor & Utilities (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+hyprland
+hypridle
+hyprlock
+hyprpaper
+seatd
+libseat1
+fuzzel
+mesa-va-drivers
+mesa-vulkan-drivers
+libgl1-mesa-dri
+libglx-mesa0

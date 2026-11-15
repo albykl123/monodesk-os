@@ -1,0 +1,17 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Audio and Multimedia (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+pipewire
+pipewire-pulse
+pipewire-alsa
+pipewire-audio
+wireplumber
+libspa-0.2-bluetooth
+pavucontrol
+playerctl
+cava
+alsa-utils
+gstreamer1.0-pipewire
+gstreamer1.0-plugins-base
+gstreamer1.0-plugins-good

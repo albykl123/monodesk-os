@@ -1,0 +1,21 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Wayland Infrastructure & Portals (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+wayland-protocols
+libwayland-client0
+libwayland-server0
+libwayland-cursor0
+libwayland-egl1
+xwayland
+xdg-desktop-portal
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xdg-utils
+wl-clipboard
+cliphist
+grim
+slurp
+libnotify-bin
+zenity
+mate-polkit

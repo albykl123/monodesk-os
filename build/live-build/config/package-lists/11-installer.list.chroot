@@ -1,0 +1,13 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Calamares Live Installer (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+calamares
+calamares-settings-debian
+parted
+gparted
+dosfstools
+e2fsprogs
+btrfs-progs
+cryptsetup
+kpmcore

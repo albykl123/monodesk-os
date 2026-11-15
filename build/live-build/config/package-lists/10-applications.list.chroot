@@ -1,0 +1,30 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Desktop Applications & Utilities (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+# Core Applications
+firefox-esr
+nautilus
+file-roller
+mousepad
+galculator
+ristretto
+evince
+xfce4-terminal
+
+# Package Management & Flatpak
+flatpak
+packagekit
+synaptic
+
+# Printing
+cups
+cups-client
+
+# Fonts & Typography
+fonts-inter
+fonts-jetbrains-mono
+fonts-noto-core
+fonts-noto-color-emoji
+fonts-dejavu-core
+papirus-icon-theme

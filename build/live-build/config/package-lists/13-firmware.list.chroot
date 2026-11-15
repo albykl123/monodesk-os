@@ -1,14 +1,11 @@
 # ==============================================================================
-# MONODESK OS — Universal Hardware Firmware Packages
+# MONODESK OS 2.0 — Universal Hardware Firmware (Debian 13 Trixie AMD64)
 # ==============================================================================
 
-# General Linux Firmware
 firmware-linux
 firmware-linux-free
 firmware-linux-nonfree
 firmware-misc-nonfree
-
-# Wireless & Bluetooth Firmware
 firmware-iwlwifi
 firmware-realtek
 firmware-atheros
@@ -16,9 +13,7 @@ firmware-ath9k-htc
 firmware-libertas
 firmware-brcm80211
 firmware-zd1211
-
-# Audio & DSP Firmware
 firmware-sof-signed
-
-# Dedicated GPU Firmware
 firmware-amd-graphics
+intel-microcode
+amd64-microcode

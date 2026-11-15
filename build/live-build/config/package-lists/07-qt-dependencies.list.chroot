@@ -1,0 +1,26 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Qt 6 & QML Runtime Dependencies (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+libqt6core6
+libqt6gui6
+libqt6qml6
+libqt6quick6
+libqt6quickcontrols2-6
+libqt6svg6
+libqt6widgets6
+libqt6shadertools6
+qt6-qpa-plugins
+qt6-image-formats-plugins
+qt6-wayland
+qml6-module-qtquick
+qml6-module-qtquick-window
+qml6-module-qtquick-controls
+qml6-module-qtquick-layouts
+qml6-module-qtquick-templates
+qml6-module-qtquick-shapes
+qml6-module-qtqml-models
+python3-pyqt6
+python3-pyqt6.qtquick
+python3-pyqt6.qtqml
+python3-pyqt6.qtsvg

@@ -1,5 +1,5 @@
 # ==============================================================================
-# MONODESK OS — Core System Packages (Debian 12 AMD64)
+# MONODESK OS 2.0 — Core System Packages (Debian 13 Trixie AMD64)
 # ==============================================================================
 
 # Kernel & Bootloader
@@ -12,10 +12,6 @@ live-config
 live-config-systemd
 user-setup
 
-# Microcode (Intel & AMD)
-intel-microcode
-amd64-microcode
-
 # Base System Infrastructure
 systemd
 systemd-sysv
@@ -27,31 +23,11 @@ locales
 tzdata
 console-setup
 keyboard-configuration
-
-# Networking & Wireless
-network-manager
-network-manager-gnome
-wpasupplicant
-wireless-tools
-rfkill
-bluetooth
-bluez
-bluez-tools
-
-# Audio Subsystem (PipeWire Stack)
-pipewire
-pipewire-pulse
-pipewire-alsa
-wireplumber
-pavucontrol
-
-# Power Management & Peripherals
-upower
-power-profiles-daemon
-acpid
-acpi-support
-libinput-bin
-xserver-xorg-input-libinput
+curl
+wget
+tar
+gzip
+xz-utils
 
 # Security & Permissions
 ufw

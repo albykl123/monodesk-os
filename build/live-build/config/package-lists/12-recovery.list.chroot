@@ -1,0 +1,12 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Recovery & Legacy Hardware Environment (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+xorg
+xserver-xorg-core
+xserver-xorg-video-all
+xinit
+xfwm4
+lightdm
+lightdm-gtk-greeter
+xterm

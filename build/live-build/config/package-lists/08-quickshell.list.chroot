@@ -1,0 +1,12 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Quickshell Shell Framework Runtime (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+qt6-declarative-dev
+qt6-base-dev
+qt6-wayland-dev
+libwayland-client0
+libwayland-cursor0
+libwayland-egl1
+libglib2.0-0
+libjemalloc2

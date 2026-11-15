@@ -1,0 +1,8 @@
+# ==============================================================================
+# MONODESK OS 2.0 — Bluetooth Subsystem (Debian 13 Trixie AMD64)
+# ==============================================================================
+
+bluetooth
+bluez
+bluez-tools
+pulseaudio-module-bluetooth
