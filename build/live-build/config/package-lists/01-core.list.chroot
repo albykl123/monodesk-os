@@ -33,7 +33,7 @@ xz-utils
 ufw
 apparmor
 apparmor-utils
-policykit-1
+polkitd
 pkexec
 
 # Memory & Swap Optimization

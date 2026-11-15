@@ -11,7 +11,7 @@ echo "[MONODESK Hook] Hardening network security and enabling system defenses...
 if command -v ufw >/dev/null 2>&1; then
     ufw default deny incoming || true
     ufw default allow outgoing || true
-    ufw enable || true
+    ufw --force enable || true
 fi
 
 # 2. Enable AppArmor

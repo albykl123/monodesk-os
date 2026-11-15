@@ -10,6 +10,10 @@ lb config noauto \
     --mode debian \
     --distribution trixie \
     --parent-distribution trixie \
+    --distribution-chroot trixie \
+    --distribution-binary trixie \
+    --parent-distribution-chroot trixie \
+    --parent-distribution-binary trixie \
     --architectures amd64 \
     --linux-flavours amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
@@ -28,5 +32,7 @@ lb config noauto \
     --apt-recommends false \
     --apt-indices false \
     --cache true \
+    --cache-packages true \
+    --cache-stages "bootstrap chroot rootfs" \
     --compression xz \
     "${@}"

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Compatibility Centre
+Comment=Run Windows software (.exe / .msi), manage Wine prefixes, and inspect compatibility ratings
+Exec=monodesk-compatibility
+Icon=wine
+Terminal=false
+Type=Application
+Categories=Utility;System;
+StartupNotify=true

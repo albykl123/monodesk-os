@@ -4,6 +4,19 @@
   "edition": "Universal PC Edition",
   "architecture": "x86_64",
   "base_os": "Debian GNU/Linux 13 (Trixie)",
+  "kernel": "6.12.117+deb13-amd64",
+  "build_date": "2026-11-15T18:09:20Z",
+  "iso": {
+    "filename": "monodesk-os-2.0.0-universal-amd64.iso",
+    "size_bytes": 1190991872,
+    "size_human": "1.11 GiB",
+    "sha256": "c3ca6813983f2518d2b5b27993231dc104d8041618c5ee974353423797847ac2",
+    "volume_id": "MONODESK_2_0_AMD64",
+    "bootloaders": {
+      "uefi": "GRUB 2 EFI x86_64 (bootx64.efi, grubx64.efi)",
+      "bios": "Hybrid El Torito MBR / Isolinux + GRUB 2"
+    }
+  },
   "desktop_engine": {
     "primary": "MONODESK Wayland (Hyprland + Quickshell / Nebula)",
     "recovery": "MONODESK Recovery (X11 + XFWM4)",
@@ -35,9 +48,17 @@
       "license": "Apache-2.0"
     }
   },
+  "validation": {
+    "debian_13_packages_audit": "178/178 available (100%)",
+    "m3shapes_plugin": "Built and verified via Qt 6.8.2 QML engine",
+    "qml_headless_check": "Passed (exit 0)",
+    "uefi_boot": "Validated in QEMU (EDK2/OVMF)",
+    "bios_boot": "Validated in QEMU (Legacy BIOS)",
+    "session_startup": "Validated in QEMU (LightDM + PipeWire + NetworkManager + zram)",
+    "pytest_suite": "41/41 passed"
+  },
   "build_pipeline": {
     "automation": ".github/workflows/build-iso.yml",
-    "runner": "ubuntu-24.04 (GitHub Actions)",
     "package_manager": "apt (live-build for Debian 13 Trixie)",
     "iso_filename": "monodesk-os-2.0.0-universal-amd64.iso"
   }

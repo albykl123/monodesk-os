@@ -2,7 +2,7 @@
 # MONODESK OS 2.0 — Qt 6 & QML Runtime Dependencies (Debian 13 Trixie AMD64)
 # ==============================================================================
 
-libqt6core6
+libqt6core6t64
 libqt6gui6
 libqt6qml6
 libqt6quick6

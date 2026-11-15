@@ -10,4 +10,4 @@ dosfstools
 e2fsprogs
 btrfs-progs
 cryptsetup
-kpmcore
+libkpmcore12

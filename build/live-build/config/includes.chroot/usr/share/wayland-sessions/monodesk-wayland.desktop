@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=MONODESK Wayland
+Comment=MONODESK OS Wayland Desktop (Hyprland + Quickshell)
+Exec=/usr/bin/monodesk-session wayland
+TryExec=Hyprland
+Type=Application
+DesktopNames=Hyprland
+Keywords=wayland;hyprland;quickshell;monodesk;

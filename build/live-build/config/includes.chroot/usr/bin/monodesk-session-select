@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# MONODESK OS — Hardware Session Selector
+# Evaluates hardware capabilities and executes the appropriate desktop session.
+# ==============================================================================
+set -e
+
+exec /usr/bin/monodesk-session auto

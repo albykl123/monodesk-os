@@ -1,0 +1,17 @@
+xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.
+
+xorriso : NOTE : Loading ISO image tree from LBA 0
+xorriso : UPDATE :     553 nodes read in 1 seconds
+xorriso : NOTE : Detected El-Torito boot information which currently is set to be discarded
+Drive current: -indev '/root/monodesk-os/releases/monodesk-os-2.0.0-universal-amd64.iso'
+Media current: stdio file, overwriteable
+Media status : is written , is appendable
+Boot record  : El Torito
+Media summary: 1 session, 581539 data blocks, 1136m data, 27.7g free
+Volume id    : 'MONODESK_2_0_AMD64'
+-V 'MONODESK_2_0_AMD64'
+--modification-date='2026111518092000'
+-c '/boot.catalog'
+-e '/boot/grub/efi.img'
+-no-emul-boot
+-boot-load-size 7424

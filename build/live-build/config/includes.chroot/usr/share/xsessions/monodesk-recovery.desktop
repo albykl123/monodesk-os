@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=MONODESK Recovery
+Comment=MONODESK OS Recovery & Low-Spec X11 Desktop
+Exec=/usr/bin/monodesk-session x11
+TryExec=xfwm4
+Type=Application
+DesktopNames=MONODESK;XFCE
+Keywords=x11;xfwm4;recovery;monodesk;

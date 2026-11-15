@@ -9,7 +9,7 @@ libwayland-cursor0
 libwayland-egl1
 xwayland
 xdg-desktop-portal
-xdg-desktop-portal-hyprland
+xdg-desktop-portal-wlr
 xdg-desktop-portal-gtk
 xdg-utils
 wl-clipboard

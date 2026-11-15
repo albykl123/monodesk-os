@@ -85,5 +85,6 @@ cat << 'EOF' > "$XFCE_DIR/xfwm4.xml"
 </channel>
 EOF
 
-# Install custom desktop binaries to /usr/bin/
+# Install custom desktop binaries to /usr/bin/ and refresh ldconfig
 chmod +x /usr/bin/monodesk-* || true
+ldconfig || true

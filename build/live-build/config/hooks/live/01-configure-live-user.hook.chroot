@@ -26,7 +26,7 @@ cat << 'EOF' > /etc/lightdm/lightdm.conf.d/01-monodesk-autologin.conf
 [Seat:*]
 autologin-user=monodesk
 autologin-user-timeout=0
-user-session=xfce
+user-session=monodesk-session
 EOF
 
 # Setup desktop launcher icons for live desktop
@@ -75,6 +75,9 @@ Terminal=false
 Categories=System;
 EOF
 chmod +x "$USER_DESKTOP/monodesk-hardware-report.desktop"
+
+# Ensure monodesk scripts and session launchers are executable
+chmod +x /usr/bin/monodesk-* || true
 
 # Enable system services
 if command -v systemctl >/dev/null 2>&1; then

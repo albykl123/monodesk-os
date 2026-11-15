@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# MONODESK OS — Hardware Diagnostics Launcher Wrapper
+# ==============================================================================
+set -e
+
+if [ -f /usr/share/monodesk/applications/hardware-report/monodesk_hardware_report.py ]; then
+    exec python3 /usr/share/monodesk/applications/hardware-report/monodesk_hardware_report.py "$@"
+elif [ -f /root/monodesk-os/applications/hardware-report/monodesk_hardware_report.py ]; then
+    exec python3 /root/monodesk-os/applications/hardware-report/monodesk_hardware_report.py "$@"
+elif [ -x /usr/bin/monodesk-hw-detect ]; then
+    exec /usr/bin/monodesk-hw-detect --report
+else
+    echo "[MONODESK Diagnostics] Diagnostic tool not available." >&2
+    exit 1
+fi

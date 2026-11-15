@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=MONODESK OS
+Comment=MONODESK OS Adaptive Universal Desktop
+Exec=/usr/bin/monodesk-session auto
+TryExec=/usr/bin/monodesk-session
+Type=Application
+DesktopNames=MONODESK;Hyprland;XFCE
+Keywords=monodesk;wayland;x11;desktop;

@@ -8,5 +8,5 @@ qt6-wayland-dev
 libwayland-client0
 libwayland-cursor0
 libwayland-egl1
-libglib2.0-0
+libglib2.0-0t64
 libjemalloc2

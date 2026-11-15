@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Accessibility
+Comment=Configure screen magnification, font scaling, screen reader, and motor assistance
+Exec=monodesk-accessibility
+Icon=preferences-desktop-accessibility
+Terminal=false
+Type=Application
+Categories=Settings;Accessibility;
+StartupNotify=true

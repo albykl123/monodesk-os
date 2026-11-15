@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Print Centre
+Comment=Discover printers, manage print queues, and configure CUPS drivers
+Exec=monodesk-print-centre
+Icon=printer
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;Printing;
+StartupNotify=true

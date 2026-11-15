@@ -1,0 +1,122 @@
+/* =============================================================================
+ * MONODESK OS — High-Contrast Monochrome GTK 3 Theme (Monodesk-Dark)
+ * Clean industrial lines, high legibility, subtle borders, dot-matrix accents
+ * ============================================================================= */
+
+@define-color theme_base_color #0E0E10;
+@define-color theme_bg_color #141416;
+@define-color theme_fg_color #F5F5F7;
+@define-color theme_selected_bg_color #E63946;
+@define-color theme_selected_fg_color #FFFFFF;
+@define-color border_color #2A2A30;
+@define-color card_bg #1C1C20;
+@define-color card_hover #26262C;
+@define-color accent_red #E63946;
+
+* {
+    font-family: 'Inter', 'Ubuntu', sans-serif;
+    outline: none;
+    -gtk-secondary-caret-color: @accent_red;
+}
+
+window, .background {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Base buttons */
+button {
+    background-color: @card_bg;
+    color: @theme_fg_color;
+    border: 1px solid @border_color;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 150ms ease-in-out;
+}
+
+button:hover {
+    background-color: @card_hover;
+    border-color: #404048;
+}
+
+button:active {
+    background-color: #121214;
+    border-color: @accent_red;
+}
+
+button.suggested-action {
+    background-color: #FFFFFF;
+    color: #000000;
+    font-weight: 600;
+    border: none;
+}
+
+button.suggested-action:hover {
+    background-color: #E2E2E6;
+}
+
+button.destructive-action {
+    background-color: @accent_red;
+    color: #FFFFFF;
+    border: none;
+}
+
+/* Header bars & Titles */
+headerbar {
+    background-color: @theme_base_color;
+    border-bottom: 1px solid @border_color;
+    padding: 6px 12px;
+}
+
+headerbar .title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+headerbar .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #8E8E93;
+}
+
+/* Entry and Inputs */
+entry {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border: 1px solid @border_color;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+entry:focus {
+    border-color: #FFFFFF;
+    box-shadow: 0 0 0 1px #FFFFFF;
+}
+
+/* Scrollbars */
+scrollbar slider {
+    background-color: #383842;
+    border-radius: 4px;
+    min-width: 6px;
+    min-height: 6px;
+}
+
+scrollbar slider:hover {
+    background-color: #555560;
+}
+
+/* Custom Panel Dock Styling */
+.xfce4-panel, #panel {
+    background-color: rgba(14, 14, 16, 0.96);
+    border-top: 1px solid @border_color;
+}
+
+/* Dot-matrix clock styling */
+.monodesk-dotmatrix-clock {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #FFFFFF;
+}

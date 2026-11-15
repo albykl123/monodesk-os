@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# MONODESK OS — Welcome Application Launcher Wrapper
+# ==============================================================================
+set -e
+
+if [ -f /usr/share/monodesk/applications/welcome/monodesk_welcome.py ]; then
+    exec python3 /usr/share/monodesk/applications/welcome/monodesk_welcome.py "$@"
+elif [ -f /root/monodesk-os/applications/welcome/monodesk_welcome.py ]; then
+    exec python3 /root/monodesk-os/applications/welcome/monodesk_welcome.py "$@"
+else
+    echo "[MONODESK Welcome] Welcome application not found." >&2
+    exit 1
+fi

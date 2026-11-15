@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# MONODESK OS — Desktop Shell Launcher Wrapper
+# ==============================================================================
+set -e
+
+export QT_QUICK_CONTROLS_STYLE=Basic
+export QML_IMPORT_PATH="/usr/share/monodesk:/usr/lib/x86_64-linux-gnu/qt6/qml:/usr/local/lib/qt6/qml:${QML_IMPORT_PATH}"
+export QML2_IMPORT_PATH="${QML_IMPORT_PATH}"
+
+if [ -f /usr/share/monodesk/desktop/shell/monodesk_shell.py ]; then
+    exec python3 /usr/share/monodesk/desktop/shell/monodesk_shell.py "$@"
+elif [ -f /root/monodesk-os/desktop/shell/monodesk_shell.py ]; then
+    exec python3 /root/monodesk-os/desktop/shell/monodesk_shell.py "$@"
+else
+    echo "[MONODESK Shell] Shell binary not found." >&2
+    exit 1
+fi

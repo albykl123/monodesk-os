@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Bluetooth Centre
+Comment=Pair, manage, and inspect Bluetooth audio headsets, keyboards, and mice
+Exec=monodesk-bluetooth-centre
+Icon=bluetooth
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;
+StartupNotify=true

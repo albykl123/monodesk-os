@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# MONODESK OS 2.0 — Unified Dual-Engine Session Router
+# Intelligently selects between Wayland (Hyprland + Quickshell)
+# and Recovery / Low-Spec X11 Session based on hardware capabilities.
+# ==============================================================================
+
+set -e
+
+SESSION_TARGET="${1:-auto}"
+
+log() {
+    echo "[monodesk-session] $*"
+}
+
+# Ensure user runtime directories exist
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME"
+
+# Initialize MONODESK profile if not yet set
+if [ -x /usr/bin/monodesk-profile-ctl ]; then
+    CURRENT_PROFILE=$(/usr/bin/monodesk-profile-ctl --get 2>/dev/null || echo "standard")
+    export MONODESK_PROFILE="$CURRENT_PROFILE"
+fi
+
+# Detect hardware compositor capability if auto
+if [ "$SESSION_TARGET" = "auto" ]; then
+    if [ -x /usr/bin/monodesk-hw-detect ]; then
+        SESSION_TARGET=$(/usr/bin/monodesk-hw-detect --check-compositor 2>/dev/null || echo "x11")
+    else
+        SESSION_TARGET="wayland"
+    fi
+fi
+
+log "Hardware compositor target: $SESSION_TARGET (Profile: ${MONODESK_PROFILE:-standard})"
+
+if [ "$SESSION_TARGET" = "wayland" ]; then
+    log "Initializing MONODESK Wayland Session (Hyprland + Quickshell)..."
+    export XDG_CURRENT_DESKTOP=Hyprland
+    export XDG_SESSION_TYPE=wayland
+    export XDG_SESSION_DESKTOP=Hyprland
+    export QT_QPA_PLATFORM="wayland;xcb"
+    export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+    export GDK_BACKEND="wayland,x11"
+    export CLUTTER_BACKEND=wayland
+    export MOZ_ENABLE_WAYLAND=1
+    export _JAVA_AWT_WM_NONREPARENTING=1
+    export SDL_VIDEODRIVER=wayland
+
+    # Stage default nebula quickshell configurations if missing in user home
+    if [ ! -d "$XDG_CONFIG_HOME/quickshell" ] && [ -d /usr/share/monodesk/shell/quickshell ]; then
+        mkdir -p "$XDG_CONFIG_HOME/quickshell"
+        cp -rn /usr/share/monodesk/shell/quickshell/* "$XDG_CONFIG_HOME/quickshell/" 2>/dev/null || true
+    fi
+
+    # Stage default hyprland configurations if missing
+    if [ ! -d "$XDG_CONFIG_HOME/hypr" ] && [ -d /etc/skel/.config/hypr ]; then
+        mkdir -p "$XDG_CONFIG_HOME/hypr"
+        cp -rn /etc/skel/.config/hypr/* "$XDG_CONFIG_HOME/hypr/" 2>/dev/null || true
+    fi
+
+    exec Hyprland
+else
+    log "Initializing MONODESK Recovery / Fallback Session (X11 + XFWM4)..."
+    export XDG_CURRENT_DESKTOP=MONODESK
+    export XDG_SESSION_TYPE=x11
+    export XDG_SESSION_DESKTOP=MONODESK
+    export QT_QPA_PLATFORM=xcb
+    export GDK_BACKEND=x11
+
+    # Start X11 window manager and MONODESK Shell in background
+    if command -v xfwm4 >/dev/null 2>&1; then
+        xfwm4 --compositor=off &
+    fi
+
+    # Start PipeWire user session if present
+    if command -v pipewire >/dev/null 2>&1; then
+        gentoo_pipewire() {
+            systemctl --user start pipewire wireplumber 2>/dev/null || true
+        }
+        gentoo_pipewire &
+    fi
+
+    # Launch MONODESK Desktop Shell
+    if [ -f /usr/share/monodesk/desktop/shell/monodesk_shell.py ]; then
+        exec python3 /usr/share/monodesk/desktop/shell/monodesk_shell.py
+    elif [ -f "$HOME/.local/share/monodesk/desktop/shell/monodesk_shell.py" ]; then
+        exec python3 "$HOME/.local/share/monodesk/desktop/shell/monodesk_shell.py"
+    else
+        exec xterm
+    fi
+fi
