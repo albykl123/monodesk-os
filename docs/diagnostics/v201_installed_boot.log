@@ -1,0 +1,70 @@
+[2J[01;01H[=3h[2J[01;01H[2J[01;01H[=3h[2J[01;01H[2J[01;01H[=3h[2J[01;01HBdsDxe: loading Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x4,0x0)
+BdsDxe: starting Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x4,0x0)
+[0m[30m[47mWelcome to GRUB!
+
+[0m[37m[40merror: no such device: /.disk/info.
+error: no such device: /.disk/mini-info.
+[0m[30m[40m[2J[01;01H[0m[37m[40m[H[J[1;1H[?25l[m[H[J[1;1H[2;24HGNU GRUB  version 2.06-13+deb12u2
+
+[m[4;2H+----------------------------------------------------------------------------+[5;2H|[5;79H|[6;2H|[6;79H|[7;2H|[7;79H|[8;2H|[8;79H|[9;2H|[9;79H|[10;2H|[10;79H|[11;2H|[11;79H|[12;2H|[12;79H|[13;2H|[13;79H|[14;2H|[14;79H|[15;2H|[15;79H|[16;2H+----------------------------------------------------------------------------+[m[17;2H[18;2H[m     Use the ^ and v keys to select which entry is highlighted.          
+      Press enter to boot the selected OS, `e' to edit the commands       
+      before booting or `c' for a command-line. ESC to return             
+      previous menu.                                                      [5;80H [7m[5;3H*Monodesk GNU/Linux                                                         [m[5;78H[m[m[6;3H Advanced options for Monodesk GNU/Linux                                    [m[6;78H[m[m[7;3H                                                                            [m[7;78H[m[m[8;3H                                                                            [m[8;78H[m[m[9;3H                                                                            [m[9;78H[m[m[10;3H                                                                            [m[10;78H[m[m[11;3H                                                                            [m[11;78H[m[m[12;3H                                                                            [m[12;78H[m[m[13;3H                                                                            [m[13;78H[m[m[14;3H                                                                            [m[14;78H[m[m[15;3H                                                                            [m[15;78H[m[15;80H [5;78H[0m[30m[40m[2J[01;01H[0m[37m[40m[02;34HGNU GRUB  version 2.06-13+deb12u2
+
+[0m[36m[44m[04;02H┌────────────────────────────────────────────────────────────────────────────────────────────────┐[05;02H│[05;99H│[06;02H│[06;99H│[07;02H│[07;99H│[08;02H│[08;99H│[09;02H│[09;99H│[10;02H│[10;99H│[11;02H│[11;99H│[12;02H│[12;99H│[13;02H│[13;99H│[14;02H│[14;99H│[15;02H│[15;99H│[16;02H│[16;99H│[17;02H│[17;99H│[18;02H│[18;99H│[19;02H│[19;99H│[20;02H│[20;99H│[21;02H│[21;99H│[22;02H│[22;99H│[23;02H│[23;99H│[24;02H└────────────────────────────────────────────────────────────────────────────────────────────────┘[25;02H[26;02H[0m[37m[40m     Use the ▲ and ▼ keys to select which entry is highlighted.                              
+      Press enter to boot the selected OS, `e' to edit the commands before booting or `c' for 
+      a command-line. ESC to return previous menu.                                            [05;:0H [1m[37m[44m[05;03H*Monodesk GNU/Linux                                                                             [0m[36m[44m[05;98H[0m[37m[40m[0m[36m[44m[06;03H Advanced options for Monodesk GNU/Linux                                                        [06;98H[0m[37m[40m[0m[36m[44m[07;03H                                                                                                [07;98H[0m[37m[40m[0m[36m[44m[08;03H                                                                                                [08;98H[0m[37m[40m[0m[36m[44m[09;03H                                                                                                [09;98H[0m[37m[40m[0m[36m[44m[10;03H                                                                                                [10;98H[0m[37m[40m[0m[36m[44m[11;03H                                                                                                [11;98H[0m[37m[40m[0m[36m[44m[12;03H                                                                                                [12;98H[0m[37m[40m[0m[36m[44m[13;03H                                                                                                [13;98H[0m[37m[40m[0m[36m[44m[14;03H                                                                                                [14;98H[0m[37m[40m[0m[36m[44m[15;03H                                                                                                [15;98H[0m[37m[40m[0m[36m[44m[16;03H                                                                                                [16;98H[0m[37m[40m[0m[36m[44m[17;03H                                                                                                [17;98H[0m[37m[40m[0m[36m[44m[18;03H                                                                                                [18;98H[0m[37m[40m[0m[36m[44m[19;03H                                                                                                [19;98H[0m[37m[40m[0m[36m[44m[20;03H                                                                                                [20;98H[0m[37m[40m[0m[36m[44m[21;03H                                                                                                [21;98H[0m[37m[40m[0m[36m[44m[22;03H                                                                                                [22;98H[0m[37m[40m[0m[36m[44m[23;03H                                                                                                [23;98H[0m[37m[40m[23;:0H [05;98H[29;01H   The highlighted entry will be executed automatically in 5s.                                     [05;98H[22;1H   The highlighted entry will be executed automatically in 5s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 4s.                                     [05;98H[22;1H   The highlighted entry will be executed automatically in 4s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 3s.                                     [05;98H[22;1H   The highlighted entry will be executed automatically in 3s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 2s.                                     [05;98H[22;1H   The highlighted entry will be executed automatically in 2s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 1s.                                     [05;98H[22;1H   The highlighted entry will be executed automatically in 1s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 0s.                                     [05;98H[22;1H   The highlighted entry will be executed automatically in 0s.                 [5;78H[0m[30m[40m[2J[01;01H[0m[37m[40m[?25h[H[J[1;1H[H[J[1;1H[0m[30m[40m[2J[01;01H[0m[37m[40m    Booting `Monodesk GNU/Linux'Booting `Monodesk GNU/Linux'
+
+
+
+Loading Linux 6.1.0-54-amd64 ...Loading Linux 6.1.0-54-amd64 ...
+
+Loading initial ramdisk ...Loading initial ramdisk ...
+
+[    0.000000] Linux version 6.1.0-54-amd64 (debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 6.1.190-1 (2026-10-16)
+[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-6.1.0-54-amd64 root=PARTUUID=970a6d39-9ad5-4eac-aa8c-3d7b546bf502 ro console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0 console=tty0 console=ttyS0,115200n8 quiet
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff] usable
+[    0.000000] BIOS-e820: [mem 0x0000000000800000-0x0000000000807fff] ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x0000000000808000-0x000000000080afff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000080b000-0x000000000080bfff] ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x000000000080c000-0x0000000000810fff] usable
+[    0.000000] BIOS-e820: [mem 0x0000000000811000-0x00000000008fffff] ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x0000000000900000-0x00000000bea2dfff] usable
+[    0.000000] BIOS-e820: [mem 0x00000000bea2e000-0x00000000beaeefff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000beaef000-0x00000000bf4ecfff] usable
+[    0.000000] BIOS-e820: [mem 0x00000000bf4ed000-0x00000000bf5ecfff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000bf5ed000-0x00000000bf6ecfff] type 20
+[    0.000000] BIOS-e820: [mem 0x00000000bf6ed000-0x00000000bf76cfff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000bf76d000-0x00000000bf77efff] ACPI data
+[    0.000000] BIOS-e820: [mem 0x00000000bf77f000-0x00000000bf7fefff] ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x00000000bf7ff000-0x00000000bfe7ffff] usable
+[    0.000000] BIOS-e820: [mem 0x00000000bfe80000-0x00000000bfe83fff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000bfe84000-0x00000000bfe85fff] ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x00000000bfe86000-0x00000000bfedbfff] usable
+[    0.000000] BIOS-e820: [mem 0x00000000bfedc000-0x00000000bff5ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000bff60000-0x00000000bfffffff] ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000013fffffff] usable
+[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0x000000ffffffffff] reserved
+[    0.000000] printk: bootconsole [earlyser0] enabled
+Memory KASLR using RDTSC...
+Poking KASLR using RDTSC...
+[    7.266882] I/O error, dev fd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+MONODESK_ROOT: clean, 64510/950272 files, 783200/3800576 blocks
+[   15.818799] platform regulatory.0: firmware: failed to load regulatory.db (-2)
+[   15.824413] firmware_class: See https://wiki.debian.org/Firmware for information about missing firmware
+[   15.832337] platform regulatory.0: firmware: failed to load regulatory.db (-2)
+[[0;1;31mFAILED[0m] Failed to start [0;1;39mmonodesk-p…formance Profile Boot Initializer.
+
+MONODESK OS 1.0.1 (Universal PC Edition) monodesk-pc ttyS0
+monodesk-pc login: monodesk (automatic login)
+
+Linux monodesk-pc 6.1.0-54-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.190-1 (2026-10-16) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
