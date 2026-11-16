@@ -95,6 +95,7 @@ Every test was physically executed inside QEMU / virtual hardware harnesses:
 - **Development Branch:** `v2.0-nebula`
 - **Release Tag:** `v2.0.0`
 - **Release Title:** MONODESK OS 2.0 — Universal PC Edition
+- **Release URL:** https://github.com/albykl123/monodesk-os/releases/tag/v2.0.0
 - **Artifacts Published:**
   - `monodesk-os-2.0.0-universal-amd64.iso`
   - `monodesk-os-2.0.0-universal-amd64.iso.sha256`
