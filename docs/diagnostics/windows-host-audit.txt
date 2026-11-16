@@ -1,0 +1,50 @@
+﻿================================================================================
+WINDOWS HOST AUDIT REPORT
+Generated: 2026-11-16 10:44:01 +05:30
+================================================================================
+
+1. OPERATING SYSTEM
+   Edition: Microsoft Windows 11 Pro
+   Version: 10.0.26300
+   Build Number: 26300
+   UBR: 
+   Architecture: 64-bit
+   Install Date: 11/04/2025 10:37:15
+
+2. SYSTEM HARDWARE
+   Manufacturer: LENOVO
+   Model: 82LN
+   System Type: x64-based PC
+   Total Physical Memory: 13.85 GB
+
+3. PROCESSOR (CPU)
+   Name: AMD Ryzen 7 5700U with Radeon Graphics         
+   Manufacturer: AuthenticAMD
+   Cores: 8
+   Logical Processors: 16
+   Max Clock Speed: 1801 MHz
+
+4. GRAPHICS (GPU)
+   - Name: AMD Radeon(TM) Graphics
+     Driver Version: 31.0.21925.1001
+     Driver Date: 05/20/2026 05:30:00
+     Resolution: 1920 x 1080 @ 60 Hz
+     Video Processor: AMD Radeon Graphics Processor (0x164C)
+     Adapter RAM: 2048 MB
+
+5. BIOS & FIRMWARE
+   BIOS Version / Date: H2CN36WW (09/02/2024 05:30:00)
+   Manufacturer: LENOVO
+   SMBIOS Major.Minor: 3.3
+   Secure Boot Enabled: Unsupported or Cannot Detect: Unable to set proper privileges. Access was denied.
+
+6. FILESYSTEM STORAGE USAGE
+
+Name UsedGB FreeGB
+---- ------ ------
+C    425.46  50.39
+D     19.05 881.21
+E      1.11  30.12
+
+
+
