@@ -1,0 +1,8 @@
+PRETTY_NAME="MONODESK OS 2.0.1-rc1 (Universal PC Edition)"
+NAME="MONODESK OS"
+VERSION_ID="2.0.1-rc1"
+VERSION="2.0.1-rc1 (Universal PC Edition)"
+VERSION_CODENAME=trixie
+ID=monodesk
+ID_LIKE=debian
+HOME_URL="https://github.com/albykl123/monodesk-os"

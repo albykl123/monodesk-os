@@ -109,6 +109,36 @@ def audit():
         else:
             print("[OK]   monodesk-hw-detect implements robust KMS / amdgpu hardware detection")
 
+    # Check 5: No UTF-8 BOM or CRLF in usr/bin wrappers
+    bin_dir = CHROOT / "usr" / "bin"
+    bom_files = []
+    crlf_files = []
+    if bin_dir.exists():
+        for bfile in bin_dir.glob("monodesk-*"):
+            bdata = bfile.read_bytes()
+            if bdata.startswith(b"\xef\xbb\xbf"):
+                bom_files.append(bfile.name)
+            if b"\r\n" in bdata:
+                crlf_files.append(bfile.name)
+    if bom_files:
+        content_failures.append(f"UTF-8 BOM found in {len(bom_files)} binaries: {', '.join(bom_files[:5])}")
+    else:
+        print("[OK]   Zero UTF-8 BOM byte-order marks in /usr/bin wrappers")
+
+    if crlf_files:
+        content_failures.append(f"Windows CRLF line endings found in {len(crlf_files)} binaries: {', '.join(crlf_files[:5])}")
+    else:
+        print("[OK]   Strict Unix LF line endings verified across all /usr/bin scripts")
+
+    # Check 6: Verified OS identity files
+    os_rel = CHROOT / "etc" / "os-release"
+    if os_rel.exists():
+        rel_txt = os_rel.read_text(encoding="utf-8")
+        if "2.0.1-rc1" not in rel_txt or "trixie" not in rel_txt:
+            content_failures.append("/etc/os-release does not specify 2.0.1-rc1 (trixie)")
+        else:
+            print("[OK]   /etc/os-release correctly identifies MONODESK OS 2.0.1-rc1 (trixie)")
+
     print("-" * 70)
     if missing or content_failures:
         print(f"AUDIT FAILED: {len(missing)} missing files, {len(content_failures)} content issues.")

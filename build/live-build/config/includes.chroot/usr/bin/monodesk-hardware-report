@@ -1,3 +1,3 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Auto-generated wrapper for monodesk-hardware-report
 exec python3 "/usr/share/monodesk/applications/hardware-report/monodesk_hardware_report.py" "$@"

@@ -22,7 +22,7 @@ BdsDxe: starting Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x4,0x0)
 Loading initial ramdisk ...Loading initial ramdisk ...
 
 [    0.000000] Linux version 6.1.0-54-amd64 (debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 6.1.190-1 (2026-10-16)
-[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-6.1.0-54-amd64 root=PARTUUID=970a6d39-9ad5-4eac-aa8c-3d7b546bf502 ro console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0 console=tty0 console=ttyS0,115200n8 quiet
+[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-6.1.0-54-amd64 root=PARTUUID=a616850b-f0e6-4809-96de-ddfb70551e0d ro console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0 console=tty0 console=ttyS0,115200n8 quiet
 [    0.000000] BIOS-provided physical RAM map:
 [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable
 [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff] usable
@@ -50,14 +50,15 @@ BdsDxe: starting Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x4,0x0)
 [    0.000000] printk: bootconsole [earlyser0] enabled
 Memory KASLR using RDTSC...
 Poking KASLR using RDTSC...
-[    7.266882] I/O error, dev fd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-MONODESK_ROOT: clean, 64510/950272 files, 783200/3800576 blocks
-[   15.818799] platform regulatory.0: firmware: failed to load regulatory.db (-2)
-[   15.824413] firmware_class: See https://wiki.debian.org/Firmware for information about missing firmware
-[   15.832337] platform regulatory.0: firmware: failed to load regulatory.db (-2)
-[[0;1;31mFAILED[0m] Failed to start [0;1;39mmonodesk-p…formance Profile Boot Initializer.
+[    7.255225] I/O error, dev fd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+MONODESK_ROOT: clean, 64509/950272 files, 783201/3800576 blocks
+[   15.952292] platform regulatory.0: firmware: failed to load regulatory.db (-2)
+[   15.957847] firmware_class: See https://wiki.debian.org/Firmware for information about missing firmware
+[   15.964933] platform regulatory.0: firmware: failed to load regulatory.db (-2)
 
-MONODESK OS 1.0.1 (Universal PC Edition) monodesk-pc ttyS0
+MONODESK OS 2.0.1-rc1 (Universal PC Edition) 
+ ttyS0
+
 monodesk-pc login: monodesk (automatic login)
 
 Linux monodesk-pc 6.1.0-54-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.190-1 (2026-10-16) x86_64

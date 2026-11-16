@@ -1,3 +1,3 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Auto-generated wrapper for monodesk-accessibility
 exec python3 "/usr/share/monodesk/applications/accessibility/monodesk_accessibility.py" "$@"

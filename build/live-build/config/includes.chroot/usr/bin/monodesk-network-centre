@@ -1,3 +1,3 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Auto-generated wrapper for monodesk-network-centre
 exec python3 "/usr/share/monodesk/applications/network-centre/monodesk_network_centre.py" "$@"

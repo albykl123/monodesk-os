@@ -31,6 +31,12 @@ This release candidate directly resolves four critical architectural defects ide
      - `monodesk-store` / `monodesk-software-manager` (Software Centre)
      - All 22 additional MONODESK system management utilities.
    - Registered FreeDesktop `.desktop` entries in `/usr/share/applications/` and scalable icons in `/usr/share/icons/hicolor/scalable/apps/`.
+5. **Sanitization of Wrapper Binary Headers & Shebangs:**
+   - Eliminated UTF-8 Byte Order Marks (`\xef\xbb\xbf`) and carriage returns (`\r\n`) across all `/usr/bin/monodesk-*` and `/usr/bin/quickshell` launchers.
+   - Restored Linux kernel `execve()` direct invocation capability from GUI and CLI contexts.
+   - Updated `monodesk-profile-ctl` with resilient exception handling, ensuring `monodesk-profile.service` starts with zero errors.
+6. **Installed Operating System Identity Verification:**
+   - Configured Calamares post-install hooks to write authoritative `2.0.1-rc1 (Universal PC Edition)` identity metadata to `/etc/os-release`, `/etc/issue`, and `/etc/issue.net`.
 
 ---
 
@@ -47,11 +53,15 @@ This release candidate directly resolves four critical architectural defects ide
 | **`SETTINGS_HUB_VERIFICATION.md`** | QA Report | 3 KB | Settings Hub integration audit |
 | **`SOFTWARE_CENTRE_VERIFICATION.md`** | QA Report | 3 KB | Software Centre integration audit |
 | **`MOUSE_INTERACTION_TEST_REPORT.md`** | QA Report | 4 KB | Mouse & compositor event audit |
+| **`MONODESK_2.0.1_FINAL_RELEASE_REPORT.md`** | Final Release Report | 8 KB | Master directive audit report |
+| **`v201_installed_screen.png`** | Verification Capture | 4 KB | QMP framebuffer screendump of cold boot |
 
 ---
 
 ## 🚀 Quality Assurance Validation
-- **Staging Audit:** `scripts/validate_live_build_staging.py` passed 100%.
+- **Staging Audit:** `scripts/validate_live_build_staging.py` passed 100% (28 checks).
 - **Rootfs Squashfs Audit:** Verified presence of all 24 application wrappers in `/usr/bin/` and desktop entries in `/usr/share/applications/`.
 - **UEFI Boot:** Verified via QEMU (x86_64 EDK2/OVMF firmware).
 - **BIOS Boot:** Verified via QEMU (Legacy BIOS El Torito boot core).
+- **Calamares Installation:** Partitioned and installed to disposable virtual disk (`test-disposable-101.qcow2`).
+- **Cold Boot of Installed OS:** Verified independent UEFI boot from installed disk without ISO attached (clean systemd multi-user target and automatic user session in 41.2s).

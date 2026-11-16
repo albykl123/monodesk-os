@@ -1,3 +1,3 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Auto-generated wrapper for monodesk-gaming
 exec python3 "/usr/share/monodesk/applications/gaming/monodesk_gaming.py" "$@"

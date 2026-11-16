@@ -158,18 +158,19 @@ for d in (repo / 'applications/nvidia-installer').glob('*.desktop'):
     shutil.copy2(d, overlay / 'usr/share/applications' / d.name)
 
 # OS identity files and live runtime fstab
-write_lf(overlay / 'etc/issue', "MONODESK OS 1.0.1 (Universal PC Edition) \\n \\l\n")
+write_lf(overlay / 'etc/issue', "MONODESK OS 2.0.1-rc1 (Universal PC Edition) \\n \\l\n")
+write_lf(overlay / 'etc/issue.net', "MONODESK OS 2.0.1-rc1 (Universal PC Edition)\n")
 write_lf(overlay / 'etc/hostname', "monodesk-pc\n")
 write_lf(overlay / 'etc/fstab',
     "overlay / overlay rw 0 0\n"
     "tmpfs /tmp tmpfs nosuid,nodev 0 0\n"
 )
 write_lf(overlay / 'etc/os-release',
-    'PRETTY_NAME="MONODESK OS 1.0.1 (Universal PC Edition)"\n'
+    'PRETTY_NAME="MONODESK OS 2.0.1-rc1 (Universal PC Edition)"\n'
     'NAME="MONODESK OS"\n'
-    'VERSION_ID="1.0.1"\n'
-    'VERSION="1.0.1 (Universal PC Edition)"\n'
-    'VERSION_CODENAME=bookworm\n'
+    'VERSION_ID="2.0.1-rc1"\n'
+    'VERSION="2.0.1-rc1 (Universal PC Edition)"\n'
+    'VERSION_CODENAME=trixie\n'
     'ID=monodesk\n'
     'ID_LIKE=debian\n'
     'HOME_URL="https://github.com/albykl123/monodesk-os"\n'

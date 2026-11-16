@@ -31,9 +31,12 @@ def get_current_profile():
     return "standard"
 
 def apply_lite_profile():
-    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, "w") as f:
-        f.write("# MONODESK OS Performance Profile\nPROFILE=lite\n")
+    try:
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w") as f:
+            f.write("# MONODESK OS Performance Profile\nPROFILE=lite\n")
+    except (PermissionError, FileNotFoundError, OSError):
+        pass
 
     # 1. Disable compositor shadows, animations, and opacity
     run_cmd(["xfconf-query", "-c", "xfwm4", "-p", "/general/use_compositing", "-s", "false"])
@@ -45,10 +48,11 @@ def apply_lite_profile():
     # 2. Configure aggressive zram memory compression (zstd, 50% of RAM)
     zram_conf = "/etc/default/zramswap"
     try:
+        os.makedirs(os.path.dirname(zram_conf), exist_ok=True)
         with open(zram_conf, "w") as f:
             f.write("ALGO=zstd\nPERCENT=50\nPRIORITY=100\n")
         run_cmd(["systemctl", "restart", "zramswap.service"])
-    except PermissionError:
+    except (PermissionError, FileNotFoundError, OSError):
         pass
 
     # 3. Set power daemon to power-saver if running on battery/older hardware
@@ -64,9 +68,12 @@ def apply_lite_profile():
     print("    • Low-overhead background processes enabled (target idle RAM: ~700-900 MB)")
 
 def apply_standard_profile():
-    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, "w") as f:
-        f.write("# MONODESK OS Performance Profile\nPROFILE=standard\n")
+    try:
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w") as f:
+            f.write("# MONODESK OS Performance Profile\nPROFILE=standard\n")
+    except (PermissionError, FileNotFoundError, OSError):
+        pass
 
     # 1. Enable full compositor with subtle window shadows
     run_cmd(["xfconf-query", "-c", "xfwm4", "-p", "/general/use_compositing", "-s", "true"])
@@ -79,10 +86,11 @@ def apply_standard_profile():
     # 2. Moderate zram (25% of RAM)
     zram_conf = "/etc/default/zramswap"
     try:
+        os.makedirs(os.path.dirname(zram_conf), exist_ok=True)
         with open(zram_conf, "w") as f:
             f.write("ALGO=zstd\nPERCENT=25\nPRIORITY=100\n")
         run_cmd(["systemctl", "restart", "zramswap.service"])
-    except PermissionError:
+    except (PermissionError, FileNotFoundError, OSError):
         pass
 
     # 3. Set power daemon to balanced

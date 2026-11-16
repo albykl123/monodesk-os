@@ -235,11 +235,15 @@ def step3_test_installed_boot():
         debian_identified = any("Debian" in l or "Linux version" in l or "Loading Linux" in l for l in lines)
         target_ok = any("Reached target" in l or "login:" in l for l in lines)
         user_prompt = any("login:" in l or "monodesk@" in l for l in lines)
+        os_identity_201 = any("2.0.1" in l for l in lines)
+        profile_clean = not any("Failed to start" in l and "monodesk" in l for l in lines)
 
         print(f"  [Gate 1] GRUB 2 EFI Bootloader: {'PASS' if grub_booted else 'FAIL'}", flush=True)
         print(f"  [Gate 2] Debian Kernel:         {'PASS' if debian_identified else 'FAIL'}", flush=True)
         print(f"  [Gate 3] Target Reached:         {'PASS' if target_ok else 'FAIL'}", flush=True)
         print(f"  [Gate 4] Installed User Session: {'PASS' if user_prompt else 'FAIL'}", flush=True)
+        print(f"  [Gate 5] OS Identity v2.0.1:     {'PASS' if os_identity_201 else 'FAIL'}", flush=True)
+        print(f"  [Gate 6] Profile Service Clean:  {'PASS' if profile_clean else 'FAIL'}", flush=True)
 
         if os.path.exists(INSTALLED_SCREEN_PPM):
             try:
@@ -249,7 +253,7 @@ def step3_test_installed_boot():
             except Exception as e:
                 print(f"[-] PPM to PNG conversion notice: {e}", flush=True)
 
-        success = grub_booted and debian_identified and target_ok
+        success = grub_booted and debian_identified and target_ok and user_prompt and os_identity_201 and profile_clean
         return success
     else:
         print("[-] FAILED: Boot log not found.", flush=True)
