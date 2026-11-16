@@ -54,6 +54,34 @@ class TestMonodeskShellAndSecurity(unittest.TestCase):
         self.assertIn("shellprocess@cleanup", settings)
         self.assertIn("getty@tty1.service.d", cleanup)
         self.assertIn("passwd -l root", cleanup)
+        self.assertIn("user-session=monodesk-session", cleanup)
+
+    def test_monodesk_20_calamares_branding(self):
+        desc = (REPO_ROOT / "build/live-build/config/includes.chroot/etc/calamares/branding/monodesk/branding.desc").read_text(encoding="utf-8")
+        self.assertIn('version:             "2.0.0 Universal PC Edition"', desc)
+        self.assertIn('shortVersion:        "2.0.0"', desc)
+        self.assertIn('versionedName:       "MONODESK OS 2.0.0"', desc)
+
+    def test_discover_installed_applications(self):
+        sys.path.insert(0, str(REPO_ROOT / "desktop" / "shell"))
+        from monodesk_shell import discover_installed_applications
+        apps = discover_installed_applications()
+        self.assertIsInstance(apps, list)
+        self.assertGreater(len(apps), 5)
+        names = [a["name"] for a in apps]
+        self.assertIn("MONODESK Settings", names)
+        self.assertIn("MONODESK Welcome", names)
+
+    def test_settings_all_21_categories(self):
+        sys.path.insert(0, str(REPO_ROOT / "applications" / "settings"))
+        from monodesk_settings import MonodeskSettings
+        app = MonodeskSettings()
+        # Verify stack has pages initialized
+        if hasattr(app, "stack") and app.stack:
+            pages = [child.get_name() for child in app.stack.get_children()]
+            self.assertGreaterEqual(len(pages), 20)
+            for expected in ["appearance", "display", "brightness", "audio", "microphone", "wifi", "ethernet", "bluetooth", "keyboard", "mouse", "touchpad", "power", "battery", "printers", "storage", "users", "privacy", "security", "accessibility", "updates", "about"]:
+                self.assertIn(expected, pages)
 
 
 if __name__ == "__main__":

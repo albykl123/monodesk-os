@@ -16,6 +16,7 @@ import os
 import subprocess
 import signal
 import json
+import re
 
 # Setup Environment paths
 SHELL_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -64,6 +65,85 @@ else:
     QGuiApplication = object
     QQmlApplicationEngine = object
 
+def discover_installed_applications():
+    app_dirs = [
+        "/usr/share/applications",
+        os.path.expanduser("~/.local/share/applications"),
+        os.path.join(REPO_ROOT, "applications")
+    ]
+    apps = []
+    seen = set()
+    for app_dir in app_dirs:
+        if not os.path.exists(app_dir):
+            continue
+        for root, _, files in os.walk(app_dir):
+            for file in files:
+                if not file.endswith(".desktop"):
+                    continue
+                path = os.path.join(root, file)
+                try:
+                    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                        name, exec_cmd, icon, comment, cat, nodisplay = None, None, "application-x-executable", "", "System", False
+                        in_desktop = False
+                        for line in f:
+                            line = line.strip()
+                            if line == "[Desktop Entry]":
+                                in_desktop = True
+                                continue
+                            elif line.startswith("[") and in_desktop:
+                                break
+                            if not in_desktop or "=" not in line:
+                                continue
+                            k, v = line.split("=", 1)
+                            k = k.strip()
+                            v = v.strip()
+                            if k == "Name" and not name:
+                                name = v
+                            elif k == "Exec" and not exec_cmd:
+                                exec_cmd = re.sub(r"%[a-zA-Z]", "", v).strip()
+                            elif k == "Icon" and icon == "application-x-executable":
+                                icon = v
+                            elif k == "Comment" and not comment:
+                                comment = v
+                            elif k == "Categories" and cat == "System":
+                                cat_list = [c.strip() for c in v.split(";") if c.strip()]
+                                if cat_list:
+                                    cat = cat_list[0]
+                            elif k == "NoDisplay" and v.lower() == "true":
+                                nodisplay = True
+                        if nodisplay or not name or not exec_cmd:
+                            continue
+                        if name in seen:
+                            continue
+                        seen.add(name)
+                        apps.append({
+                            "name": name,
+                            "exec": exec_cmd,
+                            "icon": icon,
+                            "desc": comment or name,
+                            "category": cat
+                        })
+                except Exception:
+                    pass
+    if not apps:
+        apps = [
+            {"name": "Files", "exec": "thunar", "icon": "system-file-manager", "desc": "File Manager", "category": "System"},
+            {"name": "Terminal", "exec": "xfce4-terminal", "icon": "utilities-terminal", "desc": "Terminal Emulator", "category": "Development"},
+            {"name": "Web Browser", "exec": "firefox-esr", "icon": "firefox-esr", "desc": "Web Browser", "category": "Internet"},
+            {"name": "Text Editor", "exec": "mousepad", "icon": "accessories-text-editor", "desc": "Text Editor", "category": "Accessories"},
+            {"name": "Calculator", "exec": "galculator", "icon": "accessories-calculator", "desc": "Scientific Calculator", "category": "Accessories"},
+            {"name": "Document Viewer", "exec": "qpdfview", "icon": "x-office-document", "desc": "Document & PDF Viewer", "category": "Office"},
+            {"name": "Image Viewer", "exec": "ristretto", "icon": "image-x-generic", "desc": "Image Viewer", "category": "Graphics"},
+            {"name": "Archive Manager", "exec": "file-roller", "icon": "package-x-generic", "desc": "Archive & Compression Manager", "category": "System"},
+            {"name": "Screenshot", "exec": "xfce4-screenshooter", "icon": "applets-screenshooter", "desc": "Screenshot Utility", "category": "Accessories"},
+            {"name": "System Monitor", "exec": "monodesk-system-monitor", "icon": "utilities-system-monitor", "desc": "Resource Monitor", "category": "System"},
+            {"name": "Software Store", "exec": "monodesk-store", "icon": "system-software-install", "desc": "Discover & Install Apps", "category": "System"},
+            {"name": "System Settings", "exec": "monodesk-settings", "icon": "preferences-system", "desc": "Central Configuration Hub", "category": "Settings"},
+            {"name": "Hardware Centre", "exec": "monodesk-hardware-centre", "icon": "hardware", "desc": "Diagnostics & Telemetry", "category": "System"},
+            {"name": "Install MONODESK OS", "exec": "calamares", "icon": "calamares", "desc": "Universal PC Installer", "category": "System"}
+        ]
+    return sorted(apps, key=lambda x: x["name"].lower())
+
 class ShellBridge(QObject):
     """Bridge between QML desktop UI and underlying Linux system services."""
     cpuChanged = pyqtSignal(float)
@@ -73,16 +153,21 @@ class ShellBridge(QObject):
     brightnessChanged = pyqtSignal(int)
     wifiChanged = pyqtSignal(bool, str)
     bluetoothChanged = pyqtSignal(bool)
+    wallpaperChanged = pyqtSignal(str)
+    installedAppsChanged = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self._prev_idle = 0
         self._prev_total = 1
+        self._installed_apps = discover_installed_applications()
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.poll_telemetry)
         self.timer.start(2000)
         self.poll_telemetry()
+        self.poll_network()
+        self.poll_bluetooth()
 
     @pyqtSlot()
     def poll_telemetry(self):
@@ -164,6 +249,114 @@ class ShellBridge(QObject):
             subprocess.run(["monodesk-profile-ctl", "set", profile], check=False)
         except Exception:
             pass
+
+    @pyqtSlot()
+    def poll_network(self):
+        try:
+            res = subprocess.run(["nmcli", "-t", "-f", "ACTIVE,SSID", "dev", "wifi"], stdout=subprocess.PIPE, text=True, check=False)
+            connected = False
+            ssid = "Disconnected"
+            for line in res.stdout.splitlines():
+                if line.startswith("yes:"):
+                    connected = True
+                    ssid = line.split(":", 1)[1].strip() or "Connected"
+                    break
+            self.wifiChanged.emit(connected, ssid)
+        except Exception:
+            self.wifiChanged.emit(False, "Offline")
+
+    @pyqtSlot()
+    def poll_bluetooth(self):
+        try:
+            res = subprocess.run(["bluetoothctl", "show"], stdout=subprocess.PIPE, text=True, check=False)
+            powered = "Powered: yes" in res.stdout
+            self.bluetoothChanged.emit(powered)
+        except Exception:
+            self.bluetoothChanged.emit(False)
+
+    @pyqtSlot(result="QVariant")
+    def getInstalledApps(self):
+        self._installed_apps = discover_installed_applications()
+        return self._installed_apps
+
+    @pyqtSlot(result="QVariant")
+    def getWallpapers(self):
+        wallpapers = []
+        wp_dir = "/usr/share/backgrounds/monodesk"
+        if os.path.exists(wp_dir):
+            for f in sorted(os.listdir(wp_dir)):
+                if f.endswith((".svg", ".png", ".jpg")):
+                    wallpapers.append(os.path.join(wp_dir, f))
+        if not wallpapers:
+            wallpapers = [
+                "/usr/share/backgrounds/monodesk/monodesk-dark-dotmatrix.svg",
+                "/usr/share/backgrounds/monodesk/monodesk-light-dotmatrix.svg"
+            ]
+        return wallpapers
+
+    @pyqtSlot(str)
+    def setWallpaper(self, path):
+        try:
+            os.makedirs("/etc/monodesk", exist_ok=True)
+            with open("/etc/monodesk/wallpaper.conf", "w") as f:
+                f.write(f"WALLPAPER={path}\n")
+        except Exception:
+            pass
+        self.wallpaperChanged.emit(path)
+
+    @pyqtSlot()
+    def lockScreen(self):
+        for cmd in [["loginctl", "lock-session"], ["xflock4"]]:
+            try:
+                subprocess.Popen(cmd)
+                break
+            except Exception:
+                continue
+
+    @pyqtSlot()
+    def logoutSession(self):
+        for cmd in [["xfce4-session-logout", "--logout", "--fast"], ["loginctl", "terminate-session", "self"]]:
+            try:
+                subprocess.Popen(cmd)
+                break
+            except Exception:
+                continue
+
+    @pyqtSlot()
+    def restartSystem(self):
+        subprocess.Popen(["systemctl", "reboot"])
+
+    @pyqtSlot()
+    def shutdownSystem(self):
+        subprocess.Popen(["systemctl", "poweroff"])
+
+    @pyqtSlot(bool)
+    def toggleWifi(self, enable):
+        state = "on" if enable else "off"
+        try:
+            subprocess.run(["nmcli", "radio", "wifi", state], check=False)
+            self.poll_network()
+        except Exception:
+            pass
+
+    @pyqtSlot(bool)
+    def toggleBluetooth(self, enable):
+        state = "on" if enable else "off"
+        try:
+            subprocess.run(["bluetoothctl", "power", state], check=False)
+            self.poll_bluetooth()
+        except Exception:
+            pass
+
+    @pyqtSlot(int)
+    def switchWorkspace(self, idx):
+        try:
+            subprocess.run(["wmctrl", "-s", str(idx)], check=False)
+        except Exception:
+            try:
+                subprocess.run(["xdotool", "set_desktop", str(idx)], check=False)
+            except Exception:
+                pass
 
 def fallback_to_xfce(reason, launch_ui=True):
     """Safely fall back to XFCE panel & desktop when Qt 6 QML shell cannot start."""

@@ -12,14 +12,14 @@ windowPlacement: center
 strings:
     productName:         "MONODESK OS"
     shortProductName:    "MONODESK"
-    version:             "1.0 Universal PC Edition"
-    shortVersion:        "1.0"
-    versionedName:       "MONODESK OS 1.0"
-    shortVersionedName:  "MONODESK 1.0"
+    version:             "2.0.0 Universal PC Edition"
+    shortVersion:        "2.0.0"
+    versionedName:       "MONODESK OS 2.0.0"
+    shortVersionedName:  "MONODESK 2.0"
     bootloaderEntryName: "MONODESK OS"
-    productUrl:          "https://github.com/monodesk-os"
-    supportUrl:          "https://github.com/monodesk-os/issues"
-    releaseNotesUrl:     "https://github.com/monodesk-os/releases"
+    productUrl:          "https://github.com/albykl123/monodesk-os"
+    supportUrl:          "https://github.com/albykl123/monodesk-os/issues"
+    releaseNotesUrl:     "https://github.com/albykl123/monodesk-os/releases/tag/v2.0.0"
 
 images:
     productLogo:         "/usr/share/icons/hicolor/scalable/apps/monodesk-icon.svg"

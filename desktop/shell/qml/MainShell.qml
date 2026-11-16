@@ -19,6 +19,15 @@ Window {
 
     // Theme instance
     property var theme: MonodeskTheme
+    property string customWallpaper: ""
+
+    Connections {
+        target: typeof shellBridge !== "undefined" ? shellBridge : null
+        ignoreUnknownSignals: true
+        function onWallpaperChanged(path) {
+            customWallpaper = "file://" + path
+        }
+    }
 
     // Layer 0: Solid theme backing (safe fallback without compositor)
     Rectangle {
@@ -30,11 +39,53 @@ Window {
     Image {
         id: wallpaper
         anchors.fill: parent
-        source: theme.isDark ?
-            "file:///usr/share/backgrounds/monodesk/monodesk-dark-dotmatrix.svg" :
-            "file:///usr/share/backgrounds/monodesk/monodesk-light-dotmatrix.svg"
+        source: customWallpaper !== "" ? customWallpaper :
+            (theme.isDark ?
+                "file:///usr/share/backgrounds/monodesk/monodesk-dark-dotmatrix.svg" :
+                "file:///usr/share/backgrounds/monodesk/monodesk-light-dotmatrix.svg")
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
+    }
+
+    // Desktop Context Menu MouseArea
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: {
+            desktopContextMenu.x = mouse.x
+            desktopContextMenu.y = mouse.y
+            desktopContextMenu.open()
+        }
+    }
+
+    Menu {
+        id: desktopContextMenu
+        title: "Desktop"
+
+        MenuItem {
+            text: "Open Terminal"
+            onTriggered: if (typeof shellBridge !== "undefined") shellBridge.launchApp("xfce4-terminal")
+        }
+        MenuItem {
+            text: "Open File Manager"
+            onTriggered: if (typeof shellBridge !== "undefined") shellBridge.launchApp("thunar")
+        }
+        MenuItem {
+            text: "System Settings"
+            onTriggered: if (typeof shellBridge !== "undefined") shellBridge.launchApp("monodesk-settings")
+        }
+        MenuItem {
+            text: "Display Configuration"
+            onTriggered: if (typeof shellBridge !== "undefined") shellBridge.launchApp("xfce4-display-settings")
+        }
+        MenuItem {
+            text: "Toggle Dark / Light Theme"
+            onTriggered: MonodeskTheme.toggleTheme()
+        }
+        MenuItem {
+            text: "Task Manager / System Monitor"
+            onTriggered: if (typeof shellBridge !== "undefined") shellBridge.launchApp("monodesk-system-monitor")
+        }
     }
 
     // Layer 2: Desktop Telemetry Widgets (Top-Right / Modular)
@@ -85,7 +136,7 @@ Window {
         anchors.rightMargin: 28
     }
 
-    // Global Shortcut Listener
+    // Global Shortcut Listeners
     Shortcut {
         sequence: "Alt+Space"
         onActivated: quickSearch.toggle()
@@ -94,5 +145,25 @@ Window {
     Shortcut {
         sequence: "Meta"
         onActivated: launcher.toggle()
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Alt+T"
+        onActivated: if (typeof shellBridge !== "undefined") shellBridge.launchApp("xfce4-terminal")
+    }
+
+    Shortcut {
+        sequence: "Meta+E"
+        onActivated: if (typeof shellBridge !== "undefined") shellBridge.launchApp("thunar")
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Alt+Delete"
+        onActivated: if (typeof shellBridge !== "undefined") shellBridge.launchApp("monodesk-system-monitor")
+    }
+
+    Shortcut {
+        sequence: "Meta+L"
+        onActivated: if (typeof shellBridge !== "undefined") shellBridge.lockScreen()
     }
 }

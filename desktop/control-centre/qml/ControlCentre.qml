@@ -6,12 +6,28 @@ import "../../themes" 1.0
 Rectangle {
     id: controlCentrePanel
     visible: false
-    width: 360
-    height: 480
+    width: 380
+    height: 520
     radius: MonodeskTheme.radiusPanel
     color: MonodeskTheme.surfacePanel
     border.color: MonodeskTheme.border
     border.width: 1
+
+    property bool wifiConnected: true
+    property string wifiSsid: "Active"
+    property bool btActive: true
+
+    Connections {
+        target: typeof shellBridge !== "undefined" ? shellBridge : null
+        ignoreUnknownSignals: true
+        function onWifiChanged(connected, ssid) {
+            wifiConnected = connected
+            wifiSsid = ssid
+        }
+        function onBluetoothChanged(powered) {
+            btActive = powered
+        }
+    }
 
     function toggle() {
         visible = !visible;
@@ -69,8 +85,8 @@ Rectangle {
                 Layout.fillWidth: true
                 height: 54
                 radius: MonodeskTheme.radiusCard
-                color: wifiMouse.containsMouse ? MonodeskTheme.surfaceCardHover : MonodeskTheme.surfaceCard
-                border.color: MonodeskTheme.border
+                color: wifiConnected ? (wifiMouse.containsMouse ? MonodeskTheme.surfaceCardHover : MonodeskTheme.surfaceCard) : MonodeskTheme.surfaceCardActive
+                border.color: wifiConnected ? MonodeskTheme.accentRed : MonodeskTheme.border
 
                 RowLayout {
                     anchors.fill: parent
@@ -79,7 +95,7 @@ Rectangle {
 
                     Text {
                         text: "📶"
-                        color: MonodeskTheme.textPrimary
+                        color: wifiConnected ? MonodeskTheme.textPrimary : MonodeskTheme.textTertiary
                         font.pixelSize: 16
                     }
 
@@ -91,21 +107,31 @@ Rectangle {
                             font.pixelSize: 12
                         }
                         Text {
-                            text: "Connected"
+                            text: wifiConnected ? wifiSsid : "Disconnected"
                             color: MonodeskTheme.textSecondary
                             font.pixelSize: 10
+                            elide: Text.ElideRight
+                            Layout.maximumWidth: 100
                         }
                     }
                 }
-                MouseArea { id: wifiMouse; anchors.fill: parent }
+                MouseArea {
+                    id: wifiMouse
+                    anchors.fill: parent
+                    onClicked: {
+                        if (typeof shellBridge !== "undefined") {
+                            shellBridge.toggleWifi(!wifiConnected)
+                        }
+                    }
+                }
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 54
                 radius: MonodeskTheme.radiusCard
-                color: btMouse.containsMouse ? MonodeskTheme.surfaceCardHover : MonodeskTheme.surfaceCard
-                border.color: MonodeskTheme.border
+                color: btActive ? (btMouse.containsMouse ? MonodeskTheme.surfaceCardHover : MonodeskTheme.surfaceCard) : MonodeskTheme.surfaceCardActive
+                border.color: btActive ? MonodeskTheme.accentRed : MonodeskTheme.border
 
                 RowLayout {
                     anchors.fill: parent
@@ -114,7 +140,7 @@ Rectangle {
 
                     Text {
                         text: "ᛒ"
-                        color: MonodeskTheme.textPrimary
+                        color: btActive ? MonodeskTheme.textPrimary : MonodeskTheme.textTertiary
                         font.pixelSize: 16
                     }
 
@@ -126,13 +152,21 @@ Rectangle {
                             font.pixelSize: 12
                         }
                         Text {
-                            text: "Active"
+                            text: btActive ? "Enabled" : "Disabled"
                             color: MonodeskTheme.textSecondary
                             font.pixelSize: 10
                         }
                     }
                 }
-                MouseArea { id: btMouse; anchors.fill: parent }
+                MouseArea {
+                    id: btMouse
+                    anchors.fill: parent
+                    onClicked: {
+                        if (typeof shellBridge !== "undefined") {
+                            shellBridge.toggleBluetooth(!btActive)
+                        }
+                    }
+                }
             }
         }
 
@@ -234,6 +268,48 @@ Rectangle {
         }
 
         Item { Layout.fillHeight: true }
+
+        // Session Management Buttons
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 6
+
+            Button {
+                Layout.fillWidth: true
+                text: "Lock"
+                onClicked: {
+                    if (typeof shellBridge !== "undefined") shellBridge.lockScreen()
+                    controlCentrePanel.visible = false
+                }
+            }
+
+            Button {
+                Layout.fillWidth: true
+                text: "Log Out"
+                onClicked: {
+                    if (typeof shellBridge !== "undefined") shellBridge.logoutSession()
+                    controlCentrePanel.visible = false
+                }
+            }
+
+            Button {
+                Layout.fillWidth: true
+                text: "Restart"
+                onClicked: {
+                    if (typeof shellBridge !== "undefined") shellBridge.restartSystem()
+                    controlCentrePanel.visible = false
+                }
+            }
+
+            Button {
+                Layout.fillWidth: true
+                text: "Shut Down"
+                onClicked: {
+                    if (typeof shellBridge !== "undefined") shellBridge.shutdownSystem()
+                    controlCentrePanel.visible = false
+                }
+            }
+        }
 
         // Bottom Navigation Row
         RowLayout {
