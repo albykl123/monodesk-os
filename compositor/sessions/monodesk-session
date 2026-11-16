@@ -29,7 +29,7 @@ fi
 # Detect hardware compositor capability if auto
 if [ "$SESSION_TARGET" = "auto" ]; then
     if [ -x /usr/bin/monodesk-hw-detect ]; then
-        SESSION_TARGET=$(/usr/bin/monodesk-hw-detect --check-compositor 2>/dev/null || echo "x11")
+        SESSION_TARGET=$(/usr/bin/monodesk-hw-detect --check-compositor 2>/dev/null || echo "wayland")
     else
         SESSION_TARGET="wayland"
     fi
@@ -50,45 +50,55 @@ if [ "$SESSION_TARGET" = "wayland" ]; then
     export _JAVA_AWT_WM_NONREPARENTING=1
     export SDL_VIDEODRIVER=wayland
 
+    # Ensure D-Bus user session is initialized
+    if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] && command -v dbus-launch >/dev/null 2>&1; then
+        eval $(dbus-launch --sh-syntax --exit-with-session)
+    fi
+
     # Stage default nebula quickshell configurations if missing in user home
-    if [ ! -d "$XDG_CONFIG_HOME/quickshell" ] && [ -d /usr/share/monodesk/shell/quickshell ]; then
+    if [ ! -d "$XDG_CONFIG_HOME/quickshell" ]; then
         mkdir -p "$XDG_CONFIG_HOME/quickshell"
-        cp -rn /usr/share/monodesk/shell/quickshell/* "$XDG_CONFIG_HOME/quickshell/" 2>/dev/null || true
+        if [ -d /etc/skel/.config/quickshell ]; then
+            cp -rn /etc/skel/.config/quickshell/* "$XDG_CONFIG_HOME/quickshell/" 2>/dev/null || true
+        elif [ -d /usr/share/monodesk/shell/quickshell ]; then
+            cp -rn /usr/share/monodesk/shell/quickshell/* "$XDG_CONFIG_HOME/quickshell/" 2>/dev/null || true
+        fi
     fi
 
     # Stage default hyprland configurations if missing
-    if [ ! -d "$XDG_CONFIG_HOME/hypr" ] && [ -d /etc/skel/.config/hypr ]; then
+    if [ ! -d "$XDG_CONFIG_HOME/hypr" ]; then
         mkdir -p "$XDG_CONFIG_HOME/hypr"
-        cp -rn /etc/skel/.config/hypr/* "$XDG_CONFIG_HOME/hypr/" 2>/dev/null || true
+        if [ -d /etc/skel/.config/hypr ]; then
+            cp -rn /etc/skel/.config/hypr/* "$XDG_CONFIG_HOME/hypr/" 2>/dev/null || true
+        elif [ -d /etc/hypr ]; then
+            cp -rn /etc/hypr/* "$XDG_CONFIG_HOME/hypr/" 2>/dev/null || true
+        fi
     fi
 
     exec Hyprland
 else
-    log "Initializing MONODESK Recovery / Fallback Session (X11 + XFWM4)..."
+    log "Initializing MONODESK Recovery Session (X11 + XFWM4)..."
     export XDG_CURRENT_DESKTOP=MONODESK
     export XDG_SESSION_TYPE=x11
     export XDG_SESSION_DESKTOP=MONODESK
     export QT_QPA_PLATFORM=xcb
     export GDK_BACKEND=x11
 
-    # Start X11 window manager and MONODESK Shell in background
+    # Start X11 window manager with compositing enabled for smooth rendering
     if command -v xfwm4 >/dev/null 2>&1; then
-        xfwm4 --compositor=off &
+        xfwm4 --compositor=on &
     fi
 
     # Start PipeWire user session if present
     if command -v pipewire >/dev/null 2>&1; then
-        gentoo_pipewire() {
-            systemctl --user start pipewire wireplumber 2>/dev/null || true
-        }
-        gentoo_pipewire &
+        systemctl --user start pipewire wireplumber 2>/dev/null || true
     fi
 
-    # Launch MONODESK Desktop Shell
-    if [ -f /usr/share/monodesk/desktop/shell/monodesk_shell.py ]; then
+    # Launch MONODESK Recovery Desktop
+    if command -v xfce4-panel >/dev/null 2>&1; then
+        exec xfce4-panel
+    elif [ -f /usr/share/monodesk/desktop/shell/monodesk_shell.py ]; then
         exec python3 /usr/share/monodesk/desktop/shell/monodesk_shell.py
-    elif [ -f "$HOME/.local/share/monodesk/desktop/shell/monodesk_shell.py" ]; then
-        exec python3 "$HOME/.local/share/monodesk/desktop/shell/monodesk_shell.py"
     else
         exec xterm
     fi

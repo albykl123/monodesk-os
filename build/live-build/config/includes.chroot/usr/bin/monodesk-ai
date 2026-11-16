@@ -1,0 +1,3 @@
+﻿#!/usr/bin/env bash
+# Auto-generated wrapper for monodesk-ai
+exec python3 "/usr/share/monodesk/applications/ai-assistant/monodesk_ai.py" "$@"

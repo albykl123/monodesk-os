@@ -153,65 +153,138 @@ def detect_ram() -> Dict[str, Any]:
     return ram
 
 def detect_gpu() -> Dict[str, Any]:
-    """Inspect GPU vendor, model, kernel driver, 3D acceleration, and software rasterizer status."""
+    """
+    Robust GPU vendor, model, kernel driver, DRM/KMS device, and Wayland compatibility inspection.
+    Uses /sys/class/drm, render nodes, and precise PCI device inspection without fragile
+    pre-session X11 dependencies like glxinfo.
+    """
     gpu = {
         "devices": [],
         "active_driver": "unknown",
-        "acceleration": "unknown", # "hardware" or "software_rasterizer"
+        "acceleration": "unknown",  # "hardware" or "software_rasterizer"
         "renderer": "unknown",
+        "has_kms": False,
+        "has_render_node": False,
+        "wayland_compatible": False,
+        "legacy_intel_hd3000": False,
         "vulkan_supported": False
     }
 
-    # Check via lspci
-    lspci_out = run_cmd(["lspci", "-nnk"])
-    if lspci_out:
-        blocks = lspci_out.split("\n\n")
-        for b in blocks:
-            if "VGA" in b or "3D" in b or "Display" in b:
-                dev = {}
-                lines = b.splitlines()
-                dev["device"] = lines[0] if lines else "Display Controller"
-                dev["driver"] = "none"
-                for line in lines:
-                    if "in use:" in line:
-                        dev["driver"] = line.split("in use:")[1].strip()
-                        gpu["active_driver"] = dev["driver"]
-                gpu["devices"].append(dev)
+    hw_drivers = ["amdgpu", "radeon", "i915", "xe", "iris", "crocus", "nouveau", "nvidia", "virtio-pci", "virtio_gpu", "vmwgfx", "qxl"]
 
-    if not gpu["devices"] and os.path.exists("/sys/class/drm"):
+    # 1. Inspect direct DRM / KMS devices in /sys/class/drm
+    if os.path.exists("/sys/class/drm"):
         try:
-            cards = [d for d in os.listdir("/sys/class/drm") if d.startswith("card")]
-            for card in cards:
-                gpu["devices"].append({"device": card, "driver": "drm"})
+            entries = os.listdir("/sys/class/drm")
+            cards = [d for d in entries if re.match(r"^card\d+$", d)]
+            render_nodes = [d for d in entries if re.match(r"^renderD\d+$", d)]
+            if render_nodes:
+                gpu["has_render_node"] = True
+
+            for card in sorted(cards):
+                card_path = os.path.join("/sys/class/drm", card)
+                dev_link = os.path.join(card_path, "device")
+                driver_name = "none"
+                vendor_id = ""
+                device_id = ""
+
+                driver_link = os.path.join(dev_link, "driver")
+                if os.path.islink(driver_link):
+                    driver_name = os.path.basename(os.readlink(driver_link))
+
+                vendor_file = os.path.join(dev_link, "vendor")
+                if os.path.exists(vendor_file):
+                    try:
+                        with open(vendor_file, "r") as f:
+                            vendor_id = f.read().strip().lower()
+                    except Exception:
+                        pass
+
+                device_file = os.path.join(dev_link, "device")
+                if os.path.exists(device_file):
+                    try:
+                        with open(device_file, "r") as f:
+                            device_id = f.read().strip().lower()
+                    except Exception:
+                        pass
+
+                # Check for legacy Intel SandyBridge HD 2000 / HD 3000 (0x0102, 0x0106, 0x0112, 0x0116, 0x0122, 0x0126)
+                if vendor_id in ["0x8086"] and any(device_id.startswith(p) for p in ["0x010", "0x011", "0x012"]):
+                    gpu["legacy_intel_hd3000"] = True
+
+                gpu["devices"].append({
+                    "device": card,
+                    "driver": driver_name,
+                    "vendor": vendor_id,
+                    "device_id": device_id
+                })
+
+                if driver_name in hw_drivers and gpu["active_driver"] == "unknown":
+                    gpu["active_driver"] = driver_name
+                    gpu["has_kms"] = True
+
         except Exception:
             pass
 
-    # Detect 3D OpenGL Renderer and Acceleration via glxinfo
-    glx = run_cmd(["glxinfo", "-B"])
-    if glx:
-        for line in glx.splitlines():
-            if "OpenGL renderer string:" in line:
-                gpu["renderer"] = line.split(":", 1)[1].strip()
-            elif "Direct rendering:" in line:
-                if "Yes" in line:
-                    gpu["acceleration"] = "hardware"
+    # 2. Inspect PCI devices via lspci -nnk (line-by-line parsing)
+    lspci_out = run_cmd(["lspci", "-nnk"])
+    if lspci_out:
+        current_dev = None
+        for line in lspci_out.splitlines():
+            pci_match = re.match(r"^([0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-9a-fA-F])\s+(.*)$", line)
+            if pci_match:
+                desc = pci_match.group(2)
+                if any(k in desc for k in ["VGA", "3D controller", "Display controller"]):
+                    current_dev = {
+                        "pci_slot": pci_match.group(1),
+                        "device": desc,
+                        "driver": "none"
+                    }
+                    if "8086:01" in desc or "HD Graphics 3000" in desc or "HD Graphics 2000" in desc:
+                        gpu["legacy_intel_hd3000"] = True
+                    gpu["devices"].append(current_dev)
                 else:
-                    gpu["acceleration"] = "software_rasterizer"
+                    current_dev = None
+            elif current_dev and "Kernel driver in use:" in line:
+                drv = line.split("in use:")[1].strip()
+                current_dev["driver"] = drv
+                if gpu["active_driver"] == "unknown" or gpu["active_driver"] not in hw_drivers:
+                    gpu["active_driver"] = drv
 
-        # Explicitly check for software fallbacks
-        if any(sw in gpu["renderer"].lower() for sw in ["llvmpipe", "softpipe", "swrast", "software rasterizer"]):
-            gpu["acceleration"] = "software_rasterizer"
+    # 3. Determine acceleration status and Wayland capability
+    if gpu["active_driver"] in hw_drivers or gpu["has_kms"] or gpu["has_render_node"]:
+        gpu["acceleration"] = "hardware"
+        gpu["renderer"] = f"KMS/DRM Hardware Acceleration ({gpu['active_driver']})"
+        if not gpu["legacy_intel_hd3000"]:
+            gpu["wayland_compatible"] = True
+    elif gpu["active_driver"] in ["vesa", "fbdev", "modesetting", "simpledrm", "efifb", "none", "unknown"]:
+        gpu["acceleration"] = "software_rasterizer"
+        gpu["renderer"] = f"Software Rasterizer / Generic Framebuffer ({gpu['active_driver']})"
+        gpu["wayland_compatible"] = False
     else:
-        # Infer acceleration from kernel driver
-        hw_drivers = ["i915", "iris", "crocus", "amdgpu", "radeon", "nouveau", "nvidia"]
-        if gpu["active_driver"] in hw_drivers:
+        if gpu["has_render_node"]:
             gpu["acceleration"] = "hardware"
-        elif gpu["active_driver"] in ["vesa", "fbdev", "modesetting", "none", "unknown"]:
+            gpu["wayland_compatible"] = True
+        else:
             gpu["acceleration"] = "software_rasterizer"
+            gpu["wayland_compatible"] = False
 
-    # Vulkan check
-    vulkan_out = run_cmd(["vulkaninfo", "--summary"])
-    if "Vulkan Instance Version" in vulkan_out or "GPU id" in vulkan_out:
+    # 4. Optional post-session graphics check (only if DISPLAY or WAYLAND_DISPLAY is already active)
+    if os.environ.get("WAYLAND_DISPLAY") or os.environ.get("DISPLAY"):
+        glx = run_cmd(["glxinfo", "-B"])
+        if glx:
+            for line in glx.splitlines():
+                if "OpenGL renderer string:" in line:
+                    gpu["renderer"] = line.split(":", 1)[1].strip()
+                    if any(sw in gpu["renderer"].lower() for sw in ["llvmpipe", "softpipe", "swrast"]):
+                        gpu["acceleration"] = "software_rasterizer"
+                        gpu["wayland_compatible"] = False
+                elif "Direct rendering:" in line and "Yes" in line and not gpu["legacy_intel_hd3000"]:
+                    gpu["acceleration"] = "hardware"
+                    gpu["wayland_compatible"] = True
+
+    # 5. Check Vulkan support
+    if gpu["active_driver"] in ["amdgpu", "i915", "xe", "nouveau", "nvidia"] and not gpu["legacy_intel_hd3000"]:
         gpu["vulkan_supported"] = True
 
     return gpu
@@ -618,18 +691,24 @@ def check_compositor(hw: Dict[str, Any]) -> str:
     """
     Determine whether system should run Wayland (Hyprland + Quickshell)
     or fallback to Recovery X11 session.
+    Decision criteria:
+    - Legacy Intel HD 3000 (SandyBridge) explicitly routes to X11 recovery.
+    - System must have KMS/DRM hardware acceleration and >= 2048 MB usable RAM for Wayland shell.
+    - Otherwise safe fallback to X11 recovery session.
     """
     gpu = hw.get("gpu", {})
     ram = hw.get("ram", {})
     total_ram = ram.get("total_mb", 4096)
-    accel = gpu.get("acceleration", "unknown")
-    driver = gpu.get("active_driver", "")
 
-    # Wayland requires hardware KMS/DRM acceleration and at least 2 GB RAM
-    if accel == "hardware" and total_ram >= 2048:
+    # 1. Explicit exclusion of legacy Intel SandyBridge HD 2000/3000
+    if gpu.get("legacy_intel_hd3000", False):
+        return "x11"
+
+    # 2. Modern hardware acceleration with Wayland support and >= 2 GB RAM
+    if (gpu.get("wayland_compatible", False) or gpu.get("acceleration") == "hardware") and total_ram >= 2048:
         return "wayland"
-    
-    # Software rasterizer or low RAM falls back to X11 recovery session
+
+    # 3. Safe fallback for software rasterizer (llvmpipe), low memory (<2GB), or recovery
     return "x11"
 
 def main():

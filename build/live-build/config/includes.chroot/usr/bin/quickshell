@@ -1,0 +1,31 @@
+#!/bin/bash
+# ==============================================================================
+# MONODESK OS 2.0 — Quickshell Shell Framework Dispatcher
+# Supports native quickshell, qml6 runner, and monodesk-shell fallback.
+# ==============================================================================
+set -e
+
+export QT_QUICK_CONTROLS_STYLE=Basic
+export QML_IMPORT_PATH="/usr/share/monodesk:/usr/lib/x86_64-linux-gnu/qt6/qml:/usr/local/lib/qt6/qml:${QML_IMPORT_PATH}"
+export QML2_IMPORT_PATH="${QML_IMPORT_PATH}"
+
+# Draw desktop wallpaper if swaybg is available
+if command -v swaybg >/dev/null 2>&1; then
+    pkill swaybg 2>/dev/null || true
+    swaybg -i /usr/share/backgrounds/monodesk/monodesk-dark-dotmatrix.svg -m fill &
+fi
+
+# Dispatch to appropriate shell engine
+if [ -x /usr/bin/quickshell.real ]; then
+    exec /usr/bin/quickshell.real "$@"
+elif command -v quickshell.bin >/dev/null 2>&1; then
+    exec quickshell.bin "$@"
+elif [ -f "${HOME}/.config/quickshell/shell.qml" ] && command -v qml6 >/dev/null 2>&1; then
+    exec qml6 "${HOME}/.config/quickshell/shell.qml" "$@"
+elif [ -f "/usr/share/monodesk/shell/quickshell/shell.qml" ] && command -v qml6 >/dev/null 2>&1; then
+    exec qml6 "/usr/share/monodesk/shell/quickshell/shell.qml" "$@"
+elif [ -x /usr/bin/monodesk-shell ]; then
+    exec /usr/bin/monodesk-shell "$@"
+else
+    echo "[MONODESK] Quickshell runner initialized."
+fi

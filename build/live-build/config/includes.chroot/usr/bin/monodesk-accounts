@@ -1,0 +1,3 @@
+﻿#!/usr/bin/env bash
+# Auto-generated wrapper for monodesk-accounts
+exec python3 "/usr/share/monodesk/applications/accounts/monodesk_accounts.py" "$@"

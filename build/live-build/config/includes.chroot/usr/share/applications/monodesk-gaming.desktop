@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Gaming Centre
+Comment=Launch Steam, Proton, Lutris, configure game controllers, and check 3D Vulkan acceleration
+Exec=monodesk-gaming
+Icon=applications-games
+Terminal=false
+Type=Application
+Categories=Game;Settings;
+StartupNotify=true

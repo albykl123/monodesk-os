@@ -9,20 +9,20 @@ set -e
 
 echo "[MONODESK Hook] Configuring MONODESK Shell session ownership..."
 
-# 1. Autostart MONODESK Shell on graphical session login
+# 1. Autostart entry for legacy session (only if explicitly requested)
 AUTOSTART_DIR="/etc/xdg/autostart"
 mkdir -p "$AUTOSTART_DIR"
 
 cat << 'EOF' > "$AUTOSTART_DIR/monodesk-shell.desktop"
 [Desktop Entry]
 Type=Application
-Name=MONODESK Desktop Shell
-Comment=The Monochrome Computing Experience Desktop Shell
+Name=MONODESK Desktop Shell (Legacy)
+Comment=The Monochrome Computing Experience Desktop Shell (Legacy Fallback)
 Exec=/usr/bin/monodesk-shell
-OnlyShowIn=XFCE;
+OnlyShowIn=MONODESK-Legacy;
 Terminal=false
 StartupNotify=false
-X-XFCE-Autostart-Override=true
+X-XFCE-Autostart-Override=false
 EOF
 
 # 2. Configure XFCE Session to use XFWM4 without duplicate panels

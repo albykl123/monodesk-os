@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Device Manager
+Comment=Inspect connected hardware devices, kernel drivers, and PCI/USB bus controllers
+Exec=monodesk-device-manager
+Icon=applications-system
+Terminal=false
+Type=Application
+Categories=System;HardwareSettings;
+StartupNotify=true

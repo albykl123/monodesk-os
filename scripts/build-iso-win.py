@@ -46,20 +46,23 @@ def make_clean_iso_name(name, is_dir=False, used_names=None):
         used_names.add(cand)
         return cand
 
-def build_iso(staging_root=None, output_iso=None, mirror=True):
+def build_iso(staging_root=None, output_iso=None, mirror=True, vol_ident=None, app_ident=None):
     staging_root = pathlib.Path(staging_root or r'D:\anti\iso_staging')
     output_iso = pathlib.Path(output_iso or r'D:\anti\monodesk-os\releases\monodesk-os-1.0.0-universal-amd64.iso')
     output_iso.parent.mkdir(parents=True, exist_ok=True)
     has_squashfs = (staging_root / 'live' / 'filesystem.squashfs').is_file()
+
+    vol_id = (vol_ident or ('MONODESK_201_RC1' if '201' in str(output_iso) or '2.0.1' in str(output_iso) else 'MONODESK_2_0' if '2.0' in str(output_iso) else 'MONODESK_1_0'))[:16]
+    app_id = (app_ident or ('MONODESK OS 2.0.1' if '201' in str(output_iso) or '2.0.1' in str(output_iso) else 'MONODESK OS 2.0' if '2.0' in str(output_iso) else 'MONODESK OS 1.0'))
     
-    print("[*] Initializing PyCdlib for MONODESK OS 1.0 Universal PC Edition...")
+    print(f"[*] Initializing PyCdlib for {app_id} (Volume: {vol_id})...")
     iso = pycdlib.PyCdlib()
     iso.new(interchange_level=3,
             joliet=3,
             rock_ridge='1.09',
-            vol_ident='MONODESK_1_0_X64',
+            vol_ident=vol_id,
             sys_ident='LINUX',
-            app_ident_str='MONODESK OS 1.0',
+            app_ident_str=app_id,
             preparer_ident_str='MONODESK ENG',
             pub_ident_str='MONODESK PROJECT')
 
@@ -181,6 +184,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--staging', default=None)
     parser.add_argument('--output', default=None)
+    parser.add_argument('--vol-ident', default=None)
+    parser.add_argument('--app-ident', default=None)
     parser.add_argument('--no-mirror', action='store_true')
     args = parser.parse_args()
-    build_iso(staging_root=args.staging, output_iso=args.output, mirror=not args.no_mirror)
+    build_iso(staging_root=args.staging, output_iso=args.output, mirror=not args.no_mirror, vol_ident=args.vol_ident, app_ident=args.app_ident)

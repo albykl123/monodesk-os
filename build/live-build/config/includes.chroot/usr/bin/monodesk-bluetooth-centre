@@ -1,0 +1,3 @@
+﻿#!/usr/bin/env bash
+# Auto-generated wrapper for monodesk-bluetooth-centre
+exec python3 "/usr/share/monodesk/applications/bluetooth-centre/monodesk_bluetooth_centre.py" "$@"

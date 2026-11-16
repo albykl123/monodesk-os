@@ -20,13 +20,14 @@ usermod -aG sudo,audio,video,plugdev,netdev,input monodesk
 echo "monodesk ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-monodesk-live
 chmod 0440 /etc/sudoers.d/99-monodesk-live
 
-# Configure LightDM autologin
+# Configure LightDM autologin with MONODESK Wayland as primary default session
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/01-monodesk-autologin.conf
 [Seat:*]
 autologin-user=monodesk
 autologin-user-timeout=0
-user-session=monodesk-session
+user-session=monodesk-wayland
+greeter-session=lightdm-gtk-greeter
 EOF
 
 # Setup desktop launcher icons for live desktop

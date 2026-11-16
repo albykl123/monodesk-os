@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MONODESK Privacy Dashboard
+Comment=Inspect network firewall, AppArmor status, and zero-telemetry policy
+Exec=monodesk-privacy
+Icon=security-high
+Terminal=false
+Type=Application
+Categories=System;Security;Settings;
+StartupNotify=true

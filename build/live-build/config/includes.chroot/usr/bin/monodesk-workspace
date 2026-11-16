@@ -1,0 +1,3 @@
+﻿#!/usr/bin/env bash
+# Auto-generated wrapper for monodesk-workspace
+exec python3 "/usr/share/monodesk/applications/workspace/monodesk_workspace.py" "$@"
