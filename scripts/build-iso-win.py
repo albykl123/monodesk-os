@@ -152,11 +152,11 @@ def build_iso(staging_root=None, output_iso=None, mirror=True, vol_ident=None, a
     assert size_bytes < 2 * 1024 * 1024 * 1024, f"ISO exceeds 2 GiB limit: {size_bytes} bytes"
     
     if mirror:
-        # Sync to Disk D target directories as requested by user
+        # Sync to target directories using current ISO filename
         targets = [
-            pathlib.Path(r'D:\monodesk-os-1.0.0-universal-amd64.iso'),
-            pathlib.Path(r'D:\anti\src\monodesk-os-1.0.0-universal-amd64.iso'),
-            pathlib.Path(r'D:\anti\monodesk-os\src\monodesk-os-1.0.0-universal-amd64.iso'),
+            pathlib.Path(rf'D:\{output_iso.name}'),
+            pathlib.Path(rf'D:\anti\src\{output_iso.name}'),
+            pathlib.Path(rf'D:\anti\monodesk-os\src\{output_iso.name}'),
         ]
         for tgt in targets:
             tgt.parent.mkdir(parents=True, exist_ok=True)

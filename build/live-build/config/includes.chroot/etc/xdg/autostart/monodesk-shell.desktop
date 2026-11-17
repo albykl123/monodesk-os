@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=MONODESK Desktop Shell
+Comment=The Monochrome Computing Experience Desktop Shell
+Exec=/usr/bin/monodesk-shell
+Terminal=false
+StartupNotify=false
+X-XFCE-Autostart-Override=false

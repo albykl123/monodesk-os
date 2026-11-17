@@ -1,0 +1,84 @@
+{
+  "project": "MONODESK OS",
+  "version": "2.0.1-rc2",
+  "edition": "Universal PC Edition",
+  "architecture": "x86_64",
+  "base_os": "Debian GNU/Linux 13 (Trixie)",
+  "kernel": "6.1.0-54-amd64",
+  "build_date": "2026-11-16T09:00:00Z",
+  "iso": {
+    "filename": "monodesk-os-2.0.1-rc2-universal-amd64.iso",
+    "size_bytes": 962668544,
+    "size_human": "918.07 MiB (0.897 GiB)",
+    "sha256": "6585af1982898658ff4ca01cd012203a92576f9d52d06b693851d74a0db6e83d",
+    "volume_id": "MONODESK_201_RC2",
+    "bootloaders": {
+      "uefi": "GRUB 2 EFI x86_64 (BOOTX64.EFI, grubx64.efi)",
+      "bios": "Hybrid El Torito MBR / Isolinux + GRUB 2 (cdboot.img)"
+    }
+  },
+  "desktop_engine": {
+    "primary": "MONODESK Wayland (Hyprland + Quickshell / Nebula)",
+    "recovery": "MONODESK Recovery (X11 + XFWM4 Composited)",
+    "session_router": "/usr/bin/monodesk-session",
+    "hardware_detector": "/usr/bin/monodesk-hw-detect"
+  },
+  "critical_fixes_incorporated": [
+    {
+      "issue": "Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000200 on physical Lenovo IdeaPad + JMicron external drive",
+      "root_cause": "The initramfs medium locator had hardcoded block devices (/dev/sr0, /dev/sda1, /dev/sdb1), strictly attempted 'mount -t iso9660', and lacked fat.ko/vfat.ko/nls_*.ko kernel modules. Partition E: on physical Disk 1 is partition 2 (/dev/sda2) formatted FAT32.",
+      "resolution": "Extracted and bundled fat.ko, vfat.ko, exfat.ko, nls_cp437.ko, nls_ascii.ko, nls_iso8859-1.ko, and nls_utf8.ko into early uncompressed CPIO initramfs; rewrote scripts/live mountroot() with dynamic device iteration (/dev/sr*, /dev/sd*, /dev/nvme*, /dev/vd*), multi-filesystem probing (iso9660, vfat, ext4, exfat), findiso loopback and auto ISO discovery, and POSIX shell constructs."
+    },
+    {
+      "issue": "Overlayfs lowerdir mount failure on FAT32 volumes",
+      "resolution": "Fixed overlay injection fallback in scripts/live to copy directly from /run/live/medium/monodesk/rootfs_overlay without failing on an invalid iso9660 remount of FAT32 block devices."
+    },
+    {
+      "issue": "Busybox syntax incompatibility in early userspace",
+      "resolution": "Replaced non-existent 'seq' command with POSIX shell for loops and native shell globbing."
+    }
+  ],
+  "profiles": {
+    "standard": {
+      "target_ram": ">= 6 GB",
+      "target_hardware": "Modern AMD Ryzen / Intel Core with DRM/KMS drivers (e.g. AMD Ryzen 7 5700U Radeon Graphics)",
+      "compositor": "Hyprland Wayland with full animations, blur, window shadows",
+      "zram_percent": 25,
+      "power_profile": "balanced"
+    },
+    "lite": {
+      "target_ram": "< 6 GB",
+      "target_hardware": "Legacy systems (e.g. Lenovo B590 with Intel Core i3-2348M, HD Graphics 3000, 4 GB RAM)",
+      "compositor": "MONODESK Recovery Session with reduced resource footprint and 50% zram compression",
+      "zram_percent": 50,
+      "power_profile": "power-saver"
+    }
+  },
+  "upstream_dependencies": {
+    "nebula": {
+      "repository": "https://github.com/LilaccFlowerr/Nebula",
+      "commit": "9749c30402b4e6712d0222c48b645fa357d0217e",
+      "license": "GNU AGPL-3.0"
+    },
+    "m3shapes": {
+      "repository": "https://github.com/soramanew/m3shapes",
+      "commit": "8a6fe8961749887d677700b6508e0c9249968b7e",
+      "license": "Apache-2.0"
+    }
+  },
+  "validation": {
+    "jmicron_e_simulation_boot": "PASSED (simulated multi-partition GPT disk with FAT32 Partition 2 mounted seamlessly via vfat and squashfs overlay)",
+    "uefi_live_boot": "PASSED via EDK2/OVMF",
+    "bios_live_boot": "PASSED via El Torito cdboot.img",
+    "calamares_installation": "PASSED to disposable 15 GiB virtual disk (test-disposable-101.qcow2)",
+    "installed_os_boot": "PASSED from target disk into GRUB 2.12 and Debian 13 user session",
+    "autologin": "PASSED (automatic login to monodesk user)",
+    "applications": "24 native MONODESK applications and wrappers operational",
+    "disk_safety_audit": "100% Non-destructive: physical Disk 0 (Windows NVMe) and Disk 1 (JMicron NTFS Partition 1 & FAT32 Partition 2) completely untouched"
+  },
+  "build_pipeline": {
+    "automation": "scripts/prepare-initrd-win.py and scripts/build-iso-win.py",
+    "compression": "zstd level 9",
+    "iso_filename": "monodesk-os-2.0.1-rc2-universal-amd64.iso"
+  }
+}

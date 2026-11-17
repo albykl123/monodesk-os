@@ -10,6 +10,7 @@ __pycache__/
 *.qcow2
 *.tar
 *.raw
+*.ppm
 
 # Live-Build working directories & temporary chroots
 build/live-build/.build/
